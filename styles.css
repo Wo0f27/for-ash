@@ -606,95 +606,88 @@ body { overflow-x: clip; max-width: 100%; }
 @media(max-width:500px) { .letter-close { margin:-9px -7px 22px auto; } }
 @media (max-width:355px) { .hero-art { height:272px; min-height:272px; } }
 
-/* V5 — An actual letter pulled from its envelope, within the chapter. */
-.envelope-stage {
-  isolation: isolate;
-  position: relative;
-  overflow: visible;
-  width: min(690px,100%);
-  margin: 0 auto;
-  min-height: 0;
-}
-.envelope-button { z-index: 6; margin: 0 auto; }
-.envelope-caption { position: relative; z-index: 1; margin: 25px 0 0; }
-.letter-extraction {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  z-index: 5;
-  width: min(640px,100%);
-  margin: 0;
-  overflow: visible;
-  transform: translateX(-50%);
-}
-.letter-extraction[hidden] { display: none !important; }
-.envelope-stage.letter-on-top .letter-extraction { z-index: 12; }
-.actual-letter {
-  display: block;
-  position: relative;
-  width: 100%;
-  max-height: none;
-  min-height: 290px;
-  overflow: visible;
-  overscroll-behavior: auto;
-  padding: clamp(38px,5.5vw,70px);
-  margin: 0;
-  transform-origin: center top;
-  border: 1px solid #ddceb3;
-  border-radius: 3px;
-  background: linear-gradient(150deg,#fffdf7,#fff8eb 78%,#f8ecd5);
-  box-shadow: 4px 15px 30px #40554936, 1px 3px 0 #e6d2ad;
-  animation: none;
-  will-change: auto;
-}
-.actual-letter.letter-in-motion { will-change:transform; }
-.actual-letter::before { inset: 12px; }
-.letter-inner { clear: none; }
-.letter-close {
-  position: relative;
-  display: flex;
-  float: none;
-  margin: -18px -20px 28px auto;
-  top: auto;
-  left: auto;
-  width: max-content;
-  z-index: 4;
-  font-size: 12px;
-  padding: 10px 13px;
-  min-height: 44px;
-}
-.letter-close span:first-child { font-size: 21px; }
-.letter-date { margin-bottom: 31px; }
-.letter-is-open .envelope-caption { opacity:0; }
-@media(max-width:800px) {
-  .envelope-stage { width:min(620px,100%); }
-  .letter-extraction { width:min(610px,100%); }
-  .actual-letter { min-height: 300px; padding:36px clamp(23px,6vw,45px); }
-}
-@media(max-width:500px) {
-  .letter-extraction { width:100%; }
-  .actual-letter { padding:31px 21px 40px; }
-  .letter-close { margin:-11px -10px 27px auto; }
-  .letter-paragraphs p { font-size: 14px; line-height:1.85; }
-  .envelope-caption { font-size:13px; }
-}
-@media(prefers-reduced-motion:reduce) {
-  .actual-letter.letter-in-motion { will-change:auto; }
-}
 
-/* The printed words stay tucked away until the sheet has been extracted. */
-.actual-letter .letter-inner, .actual-letter .letter-close { transition:opacity 230ms ease; }
-.letter-extracting .actual-letter .letter-inner,
-.letter-extracting .actual-letter .letter-close,
-.letter-returning .actual-letter .letter-inner,
-.letter-returning .actual-letter .letter-close { opacity:0; }
-.letter-extracting .actual-letter::after,
-.letter-returning .actual-letter::after {
-  content:'✧  for you  ✧'; position:absolute; top:34%; left:0; right:0;
-  text-align:center; font:italic 20px var(--serif); color:#bb9d72;
-  pointer-events:none; letter-spacing:.04em;
+/* V6 — book-cover handoff. A paper page grows out of the opened book,
+   covers the viewport, then uncovers Chapter One. No visible scrolling. */
+.book-opening-portal {
+  position:fixed; z-index:240; pointer-events:all; touch-action:none;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  gap:20px; text-align:center; padding:20px; box-sizing:border-box;
+  color:#647967; background:repeating-linear-gradient(0deg,#fffaf0 0,#fffaf0 35px,#f2e7d3 36px);
+  box-shadow:0 18px 44px #1d403755; border:2px solid #e4d3ad;
+  overflow:hidden; transform:translateZ(0);
 }
-@media(prefers-reduced-motion:reduce) {
-  .actual-letter .letter-inner, .actual-letter .letter-close {transition:none;}
+.book-opening-portal[hidden] { display:none!important; }
+.book-opening-portal::before {
+  content:''; position:absolute; inset:12px; border:1px solid #d9c8a5; pointer-events:none;
+}
+.portal-ornament {color:#ba9d72;letter-spacing:.2em;font-size:17px;}
+.portal-caption {font:700 11px var(--sans);letter-spacing:.22em;text-transform:uppercase;}
+.portal-title {font:italic clamp(19px,5vw,32px)/1.3 var(--serif);}
+
+/* V6 — one stationery sheet, not a modal or a second paper copy.
+   Envelope remains anchored; page height expands underneath the one letter. */
+.envelope-stage {
+  isolation:isolate;display:block;position:relative;overflow:visible;
+  width:min(690px,100%);margin:0 auto; min-height:312px;
+}
+.envelope-button {
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  margin:0;padding:30px 12px 14px; z-index:5; touch-action:manipulation;
+}
+.envelope-button:hover .envelope { transform:none; }
+.envelope-flap {z-index:5;backface-visibility:hidden;transition:transform 530ms cubic-bezier(.18,.74,.22,1);}
+.envelope-front {z-index:4;}
+.envelope-seal {z-index:6;}
+.envelope-button.is-open .envelope-flap {transform:rotateX(172deg);}
+.envelope-button.is-open .envelope-seal {opacity:0;}
+.envelope-caption {
+  position:absolute;top:286px;left:0;right:0; z-index:0;
+  text-align:center;font:italic 13px var(--serif);color:#748878;margin:0;
+  transition:opacity 200ms;
+}
+.letter-is-open .envelope-caption {opacity:0;}
+.letter-extraction {
+  display:block;position:absolute;top:-8px;left:50%;width:min(610px,100%);
+  transform:translateX(-50%);margin:0;overflow:visible;
+  z-index:3; pointer-events:none;
+}
+.letter-extraction[hidden] {display:none!important;}
+.letter-on-top .letter-extraction {z-index:12;pointer-events:auto;}
+.actual-letter {
+  display:block;position:relative;width:100%;min-height:300px;
+  max-height:none;overflow:visible;overscroll-behavior:auto;
+  margin:0;padding:clamp(36px,5vw,68px);z-index:1;
+  transform-origin:center top; border-radius:4px;border:1px solid #e1d0b1;
+  background:linear-gradient(155deg,#fffcf5,#fff9e9 75%,#f6edd9);
+  box-shadow:4px 18px 40px #40554930,1px 3px 0 #e6d2ad;
+  cursor:pointer; touch-action:pan-y; animation:none;
+}
+.actual-letter::before {inset:12px;}
+.actual-letter.letter-in-motion {will-change:transform;pointer-events:none;}
+.letter-inner {clear:none;opacity:0;transition:opacity 240ms ease;}
+.letter-words-visible .letter-inner {opacity:1;}
+.letter-tap-hint {opacity:0;transition:opacity 250ms;position:relative;text-align:center;
+  font:italic 12px var(--serif);color:#9d8568;margin:28px 0 0;}
+.letter-words-visible .letter-tap-hint {opacity:1;}
+.letter-tap-hint span {font-size:16px;vertical-align:middle;}
+.actual-letter:focus-visible {outline:3px solid #668e7b;outline-offset:5px;}
+.letter-paragraphs p {font-size:15px;line-height:1.85;overflow-wrap:anywhere;}
+.letter-date {margin-bottom:28px;}
+@media(max-width:800px){
+  .envelope-stage{width:min(620px,100%);}
+  .letter-extraction{width:min(590px,100%);}
+  .actual-letter{padding:34px clamp(22px,5vw,45px);}
+}
+@media(max-width:500px){
+  .envelope-stage{min-height:255px;}
+  .envelope-button {padding:12px 10px;}
+  .envelope-caption {top:234px;font-size:12px;}
+  .letter-extraction{width:100%;top:-10px;}
+  .actual-letter{min-height:300px;padding:30px 22px 38px;}
+  .letter-paragraphs p{font-size:14px;line-height:1.8;}
+  .letter-tap-hint{margin-top:24px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .letter-inner,.letter-tap-hint,.envelope-flap {transition:none;}
 }

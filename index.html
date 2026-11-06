@@ -8,10 +8,10 @@
   <meta name="robots" content="noindex,nofollow">
   <title>The Pages Between Us · A Birthday Story</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}</style></noscript>
   <script src="config.js" defer></script>
-  <script src="script.js?v=5" defer></script>
+  <script src="script.js?v=6" defer></script>
 </head>
 <body>
   <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
@@ -175,14 +175,14 @@
             <span class="envelope-label" id="envelope-label">Tap to break the seal</span>
           </button>
           <div class="letter-extraction" id="letter-extraction" hidden>
-            <article class="actual-letter" id="letter-content" aria-labelledby="letter-heading" tabindex="-1">
-              <button id="close-letter" class="letter-close" type="button" aria-label="Fold the letter and put it back in the envelope"><span aria-hidden="true">↩</span><span>Put it back</span></button>
+            <article class="actual-letter" id="letter-content" aria-labelledby="letter-heading" aria-description="Tap or press Enter to return the letter to its envelope." tabindex="0">
               <div class="letter-inner">
                 <p class="letter-date">November 7, <span data-year>2026</span></p>
                 <h3 id="letter-heading">Dear <span data-recipient>Ash</span>,</h3>
                 <div id="letter-paragraphs" class="letter-paragraphs"></div>
                 <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
               </div>
+              <p class="letter-tap-hint" aria-hidden="true">Tap the paper to fold it away <span>↶</span></p>
             </article>
           </div>
           <p class="envelope-caption">A little letter to unfold, whenever you're ready.</p>

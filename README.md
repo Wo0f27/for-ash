@@ -1,4 +1,4 @@
-# The Pages Between Us — birthday storybook (v5)
+# The Pages Between Us — birthday storybook (v6)
 
 A responsive, single-page birthday story for Ash, hosted from the public GitHub repository `Wo0f27/for-ash`. Built with HTML, CSS and JavaScript. No app framework, paid hosting, tracking, login, or server is required.
 
@@ -41,3 +41,9 @@ GitHub Pages is a public site. Keep private conversations, identifying details, 
 ## Development notes
 
 Version 5 replaces the previous full-screen letter dialog with a single letter component rendered inside the chapter. It animates from the opening of the envelope to an expanded stationery surface, and animates back into the envelope. No backdrop or document-level scroll lock is used. Letter content is unchanged.
+
+## V6 interactive fixes
+
+- Opening the storybook now expands the revealed book page to fill the screen, then switches to Chapter One underneath it instantly. **There is no visible smooth scroll** while the cover is opening.
+- The letter physically slides out of its envelope, unfolds in place, and can be returned by tapping **the letter itself** again. The envelope also toggles it, and Escape/Enter remain available. There is no close button or modal.
+- The original birthday letter and notes remain editable in `config.js`.
