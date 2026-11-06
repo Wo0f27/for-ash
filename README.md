@@ -1,4 +1,4 @@
-# The Pages Between Us — v7: the book *is* the website
+# The Pages Between Us — v8: fixed book binding and concealed letter
 
 A birthday gift for a long-distance friend, hosted on GitHub Pages. This version replaces the scrolling chapters with a real book reader.
 
@@ -24,3 +24,10 @@ No build tooling or services are needed. Enable or review GitHub Pages at **Sett
 Published URL: https://wo0f27.github.io/for-ash/
 
 **Privacy:** This public site should not contain sensitive private messages or contact information. The `noindex` meta tag is not access protection.
+
+## V8 repair notes
+
+- Portrait turns now use the same **left binding** going forward and backward. Previous-page animation returns from the left rather than swinging around the right edge.
+- A page turn has one continuous hinge rotation, no keyframe pause at 50%, and completes on the matching page animation event.
+- The letter is fully hidden under its envelope before opening; it is revealed after the flap starts moving.
+- Evaluated MIT-licensed [StPageFlip](https://github.com/Nodlik/StPageFlip) and [grabfold](https://github.com/javocsoft/grabfold) as alternative engines. This scoped fix has no added runtime dependencies and preserves the existing inside-page interactive content.

@@ -205,9 +205,12 @@
         renderInto(target+1,right);
       }
     } else if (isMobile) {
-      renderInto(current,leafFront);
-      renderInto(target,leafBack);
-      renderInto(target,right);
+      /* Reverse in portrait restores a page FROM the left binding.
+         The destination is on the FRONT of the returning sheet; the current
+         page remains underneath until the full 180° turn completes. */
+      renderInto(target,leafFront);
+      renderInto(current,leafBack);
+      // Do not replace the visible page early (it would flash at mid-turn).
     } else {
       renderInto(current,leafFront);
       renderInto(target+1,leafBack);
@@ -232,10 +235,20 @@
       turning = false;
       renderControls();
     };
-    leaf.addEventListener('animationend',e => {
-      if (e.target === leaf && (e.animationName === 'turnForward' || e.animationName === 'turnBackward')) finish();
-    },{once:true});
-    setTimeout(finish,1100);
+    let safetyTimeout = null;
+    const onEnd = event => {
+      if (event.target !== leaf || !['turnForward','turnBackward','turnBackwardPortrait'].includes(event.animationName)) return;
+      leaf.removeEventListener('animationend',onEnd);
+      clearTimeout(safetyTimeout);
+      finish();
+    };
+    leaf.addEventListener('animationend',onEnd);
+    /* Safety net only; finish on the actual leaf animation, not its child
+       shading or an arbitrary half-way timer. */
+    safetyTimeout = setTimeout(() => {
+      leaf.removeEventListener('animationend',onEnd);
+      finish();
+    }, 1500);
   }
 
   function timeIn(zone) {

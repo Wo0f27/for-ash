@@ -102,8 +102,17 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 .leaf-back { transform: rotateY(180deg); box-shadow: -2px 0 18px #493c2930; }
 .turn-leaf.is-forward { display: block; right: 7px; transform-origin: left center; animation: turnForward var(--turn-duration) cubic-bezier(.32,.75,.22,1) forwards; }
 .turn-leaf.is-backward { display: block; left: 7px; transform-origin: right center; animation: turnBackward var(--turn-duration) cubic-bezier(.32,.75,.22,1) forwards; }
-@keyframes turnForward { 0% { transform: rotateY(0deg); } 50% { transform: rotateY(-94deg); } 100% { transform: rotateY(-180deg); } }
-@keyframes turnBackward { 0% { transform: rotateY(0deg); } 50% { transform: rotateY(94deg); } 100% { transform: rotateY(180deg); } }
+/* Single continuous hinge movement: no artificial stop or velocity reset at 50%. */
+@keyframes turnForward { from { transform: rotateY(0deg); } to { transform: rotateY(-180deg); } }
+@keyframes turnBackward { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
+@keyframes turnBackwardPortrait { from { transform: rotateY(-180deg); } to { transform: rotateY(0deg); } }
+/* As the leaf crosses the center, it receives a narrow natural fold shadow. */
+.turn-leaf-face::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  background: linear-gradient(90deg,rgba(46,42,32,.14),transparent 25%,transparent 75%,rgba(46,42,32,.12));
+  opacity: 0; animation: pageBendShade var(--turn-duration) ease-in-out both;
+}
+@keyframes pageBendShade { 0%,100% {opacity: 0} 45%,55% {opacity: 1} }
 .turn-leaf .page-scroll { overflow: hidden; }
 .book-shell.is-turning .book-page { pointer-events: none; }
 
@@ -185,8 +194,14 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 .env-stamp { position: absolute; z-index: 7; left: 50%; top: 62%; transform: translate(-50%,-50%); width: 38px; height: 38px; background: #b87879; border: 3px double #d9aa9e; border-radius: 50%; color: #ffefdc; font: 21px var(--serif); display: grid; place-items: center; transition: opacity .2s; }
 .letter-world.is-open .env-flap { transform: rotateX(175deg); z-index: 2; }
 .letter-world.is-open .env-stamp { opacity: 0; }
-.letter-sheet { position: absolute; top: 0; left: 50%; width: min(332px, 96%); height: 316px; overflow-y: auto; overscroll-behavior: contain; background: #fffdf5; border: 1px solid #e1d1b7; box-shadow: 3px 7px 19px #65583f34; padding: 18px 18px 23px; z-index: 3; transform-origin: center bottom; transform: translate(-50%, 133px) scale(.77,.38); opacity: .85; pointer-events: none; transition: transform .92s cubic-bezier(.23,.77,.17,1), opacity .35s, box-shadow .5s; scrollbar-width: thin; }
-.letter-world.is-open .letter-sheet { transform: translate(-50%,0) scale(1); opacity: 1; z-index: 8; box-shadow: 5px 18px 30px #544d3e2d; pointer-events: auto; cursor: pointer; }
+.letter-sheet { position: absolute; top: 0; left: 50%; width: min(332px, 96%); height: 316px; overflow-y: auto; overscroll-behavior: contain; background: #fffdf5; border: 1px solid #e1d1b7; box-shadow: 3px 7px 19px #65583f34; padding: 18px 18px 23px; z-index: 3; transform-origin: center bottom; transform: translate(-50%, 175px) scale(.77,.34); opacity: 0; visibility: hidden;
+  pointer-events: none;
+  transition: transform .88s cubic-bezier(.23,.77,.17,1), opacity .18s ease, box-shadow .5s,
+              visibility 0s linear .88s; scrollbar-width: thin; }
+.letter-world.is-open .letter-sheet { transform: translate(-50%,0) scale(1); opacity: 1; visibility: visible; z-index: 8;
+  box-shadow: 5px 18px 30px #544d3e2d; pointer-events: auto; cursor: pointer;
+  transition: transform .88s cubic-bezier(.23,.77,.17,1) .12s,
+              opacity .32s ease .18s, box-shadow .5s, visibility 0s; }
 .sheet-inner { position: relative; border: 1px solid #eee7d6; padding: 13px 13px 6px; min-height: 100%; }
 .sheet-inner small { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #b49a78; }
 .sheet-inner h3 { font: 400 22px var(--serif); margin: 21px 0; }
@@ -253,8 +268,13 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
   .book-left, .book-gutter { display: none; }
   .book-right { width: calc(100% - 12px); left: 6px; right: 6px; }
   .turn-leaf { width: calc(100% - 12px); }
-  .turn-leaf.is-forward { left: 6px; right: 6px; }
-  .turn-leaf.is-backward { left: 6px; right: 6px; }
+  /* A portrait book has ONE binding: the left edge never becomes the right edge. */
+  .turn-leaf.is-forward { left: 6px; right: auto; transform-origin: left center; }
+  .turn-leaf.is-backward { left: 6px; right: auto; transform-origin: left center; animation: turnBackwardPortrait var(--turn-duration) cubic-bezier(.37,.0,.23,1) both; }
+  .book-shell { transform-style: preserve-3d; }
+  .book-right { box-shadow: inset 14px 0 22px -23px rgba(70,55,35,.65); }
+  .book-left, .book-gutter { display: none; }
+  .paper-surface { background: linear-gradient(90deg,#ecdec6 0,#fff9ed 10px,#fff9ed 100%); }
   .page-scroll { padding: 26px clamp(19px,5.5vw,40px) 28px; scrollbar-gutter: auto; }
   .page-content { font-size: 13px; line-height: 1.66; }
   .page-content h1 { font-size: clamp(35px,9vw,48px); }
@@ -314,3 +334,14 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 }
 /* Let the paper scroll vertically while horizontal swipes turn pages. */
 .book-shell { touch-action: pan-y; }
+
+/* V8 compositor / paper hygiene */
+.turn-leaf { will-change: transform; }
+.turn-leaf-face { transform-style: flat; -webkit-transform: translateZ(.2px); }
+.turn-leaf-face.leaf-back { transform: rotateY(180deg) translateZ(.2px); }
+.book-shell.is-turning .book-gutter { z-index: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .turn-leaf-face::before { animation: none; opacity: 0; }
+  .letter-sheet { visibility: hidden; transition: none; }
+  .letter-world.is-open .letter-sheet { visibility: visible; transition: none; }
+}
