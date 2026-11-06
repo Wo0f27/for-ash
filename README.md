@@ -1,14 +1,14 @@
-# The Pages Between Us — birthday site (v2)
+# The Pages Between Us — birthday site (v3)
 
 A mobile-friendly, self-contained birthday storybook. There are **no frameworks, build steps, trackers, or paid dependencies**.
 
-## Animated storybook interactions (v2)
+## Animated storybook interactions (v3)
 
 - Tap the book cover or **Open the story**: the cover turns on its hinge and reveals chapter one.
 - Use the **Turn to the next page** links or chapter navigation to trigger a paper-turn transition.
 - Watch the typewriter note appear in the Wattpad-era chapter.
-- Flip the memory cards, open the envelope and watch its letter peek out, and blow out the candles for smoke and confetti.
-- Reduced-motion settings are respected. The site remains a scrollable story rather than a rigid slideshow.
+- Tap the memory cards to reveal their messages immediately (no unreliable 3D backface rendering). Open the envelope and watch its letter peek out, then blow out the candles for smoke and confetti.
+- Mobile-friendly: tested at 320, 390, and 430 pixels plus tablet and desktop. Decorative elements do not extend the layout beyond the phone width.\n- Full-screen paper transitions mask destination changes so navigation does not flash two chapters.\n- Reduced-motion settings are respected. The site remains a scrollable story rather than a rigid slideshow.
 
 ## Edit your own words
 
@@ -48,4 +48,4 @@ Official guide: https://docs.github.com/en/pages/getting-started-with-github-pag
 - Do not add personal photographs without permission.
 - No auto-playing audio is included; we can add an opt-in music toggle if you provide a permitted audio track.
 - The two clocks use built-in browser `Intl` time-zone support and automatically account for daylight saving time.
-- This is **version 2**, so all design/content may still be customized before publishing.
+- This is **version 3**, so all design/content may still be customized before publishing.

@@ -70,10 +70,13 @@
     backHint.textContent = 'tap to turn back ↶';
     front.append(icon, title, subtitle);
     back.append(backMessage, backHint);
+    back.hidden = true;
     inner.append(front, back);
     button.append(inner);
     button.addEventListener('click', () => {
       const turned = button.classList.toggle('is-flipped');
+      front.hidden = turned;
+      back.hidden = !turned;
       button.setAttribute('aria-pressed', String(turned));
       button.setAttribute('aria-label', `${turned ? 'Hide' : 'Reveal'} ${note.title || 'a note'}`);
     });
@@ -114,10 +117,7 @@
     letterButton.setAttribute('aria-label', open ? 'Close the birthday letter' : 'Open the birthday letter');
     $('#envelope-label').textContent = open ? 'Tap to close the envelope' : 'Tap to break the seal';
     letterContent.hidden = !open;
-    if (open) {
-      // The opened letter stays in the normal reading flow.
-      setTimeout(() => letterContent.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest' }), 120);
-    }
+    // Do not auto-scroll while the letter unfolds; let the reader control the pace.
   });
 
   // Candle blowing, tiny celebratory confetti, and an editable birthday wish.
@@ -150,17 +150,18 @@
     }
   });
 
-
-  // V2: opening the actual cover now turns it on its hinge before revealing chapter one.
+  // V2: opening the *actual cover* now turns it on its hinge before revealing chapter one.
   const cover = $('#storybook-cover');
   const heroArt = $('.hero-art');
+  const firstChapter = $('#chapter-one');
   const turnOverlay = $('#page-turn-overlay');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let turning = false;
   let opening = false;
   function navigateTo(target, animate = true) {
     const destination = document.querySelector(target);
-    if (!destination || turning) return;
+    if (!destination) return;
+    if (turning) return;
     if (!animate || reduceMotion.matches) {
       destination.scrollIntoView({ behavior: 'instant', block: 'start' });
       history.pushState(null, '', target);
@@ -171,13 +172,14 @@
     void turnOverlay.offsetWidth; // Re-start CSS keyframes after consecutive turns.
     turnOverlay.classList.add('is-turning');
     setTimeout(() => {
+      destination.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('visible'));
       destination.scrollIntoView({ behavior: 'instant', block: 'start' });
       history.pushState(null, '', target);
-    }, 460);
+    }, 460); // 51% of the 900ms wipe: all of the viewport is covered.
     setTimeout(() => {
       turnOverlay.classList.remove('is-turning');
       turning = false;
-    }, 950);
+    }, 925);
   }
   function openTheBook(event) {
     if (event) event.preventDefault();
@@ -189,12 +191,12 @@
     opening = true;
     heroArt.classList.add('is-opening');
     cover.disabled = true;
-    setTimeout(() => navigateTo('#chapter-one', true), 1330);
+    setTimeout(() => navigateTo('#chapter-one', true), 1080);
     setTimeout(() => {
       heroArt.classList.remove('is-opening');
       cover.disabled = false;
       opening = false;
-    }, 2700);
+    }, 2150);
   }
   cover.addEventListener('click', openTheBook);
   $('#begin-story').addEventListener('click', openTheBook);
@@ -240,5 +242,4 @@
   } else {
     typeChapterNote();
   }
-
 })();

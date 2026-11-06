@@ -319,6 +319,7 @@ h2 { font-size: clamp(46px, 4.7vw, 68px); line-height: 1.2; margin-bottom: 27px;
   .hero-art[data-reveal] { transform: rotate(2deg); }
 }
 
+
 /* V2 — scenes designed to MOVE, rather than only fade into view. */
 .hero-art { perspective: 1600px; perspective-origin: 47% 45%; }
 .book-illustration {
@@ -454,3 +455,103 @@ h2 { font-size: clamp(46px, 4.7vw, 68px); line-height: 1.2; margin-bottom: 27px;
 .chapter-next-rule { display: inline-block; height: 1px; width: 35px; background: #d2b88f; }
 .chapter-next:hover { color: #294c44; transform: translateX(4px); }
 @media (max-width: 500px) { .chapter-next { flex-wrap: wrap; justify-content: center; margin: 55px auto -8px; gap: 8px; } .chapter-next-rule { width: 23px; } }
+
+
+/* V3: mobile-first repair — keep decor INSIDE the viewport and make touch targets reliable. */
+html, body { max-width: 100%; overflow-x: clip; }
+.ambient-one { left: 0; width: min(440px,45vw); }
+.ambient-two { right: 0; width: min(540px,45vw); }
+.story-section { isolation: isolate; }
+.chapter-next { margin: 72px auto 0; padding: 12px 0; min-height: 44px; }
+.chapter-next:hover { transform: translateX(3px); }
+
+/* A full-viewport paper wipe: the destination changes ONLY when covered.
+   Unlike v2's narrow rotating sheet, this never reveals half of two chapters. */
+.page-turn-overlay, .page-turn-overlay.is-turning { animation: none; }
+.page-turn-overlay { opacity: 0; pointer-events: none; }
+.page-turn-overlay.is-turning { opacity: 1; pointer-events: auto; }
+.page-turn-paper {
+  position: absolute; inset: 0; top: 0; left: 0; width: 100%; height: 100%;
+  margin: 0; border: 0; transform: none; transform-origin: center;
+  background: repeating-linear-gradient(0deg,#fff9e9 0,#fff9e9 40px,#f3e7d4 41px);
+  clip-path: inset(0 0 0 100%);
+  filter: drop-shadow(0 1px 20px #40564824);
+}
+.page-turn-overlay.is-turning .page-turn-paper { animation: paperSweepFull 900ms cubic-bezier(.58,0,.31,1) both; }
+.page-turn-paper span { color: #6d826f; }
+@keyframes paperSweepFull {
+  0% { clip-path: inset(0 0 0 100%); }
+  42%, 60% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 100% 0 0); }
+}
+
+/* Two faces share the same position; only ONE is drawn at a time.
+   No compositor-dependent 3D backface repaint or second-tap requirement. */
+.flip-note, .flip-note-inner { perspective: none; }
+.flip-note-inner, .flip-note.is-flipped .flip-note-inner {
+  transform: none !important; transform-style: flat; transition: none;
+}
+.flip-face, .flip-back { transform: none !important; backface-visibility: visible; -webkit-backface-visibility: visible; }
+.flip-note .flip-face:not([hidden]) { animation: noteFaceIn 230ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes noteFaceIn { from { opacity: .35; scale: .96; } to { opacity: 1; scale: 1; } }
+.flip-note:focus-visible { outline-offset: 7px; }
+
+@media (max-width: 800px) {
+  .ambient { display: none; }
+  .site-header { width: calc(100% - 30px); gap: 8px; }
+  .hero { padding: 44px 0 56px; gap: 14px; }
+  .hero-left { min-width: 0; }
+  .hero-art, .hero-art[data-reveal], .hero-art[data-reveal].visible { transform: none; }
+  .hero-art { min-height: 440px; }
+  .story-section { padding: 70px 0; }
+  .section-wrap { width: calc(100% - 32px); }
+  .chapter-next { margin: 45px auto 0; }
+  .chapter-grid, .distance-layout { gap: 35px; }
+  .origin-visual { height: 350px; }
+  .chapter-copy p { max-width: 420px; }
+  .flip-note, .flip-note-inner { height: 210px; min-height: 210px; }
+  .note-grid { gap: 14px; }
+  /* No vanishing cards or blank chapter on touch screens while scrolling. */
+  [data-reveal], [data-reveal].visible { opacity: 1; transform: none; transition: none; }
+  .book-illustration { transition-duration: 1.05s; }
+  .hero-art.is-opening .book-illustration { transform: rotateY(-100deg); }
+  .envelope-peek { transition-duration: 650ms; }
+  .actual-letter { margin-top: 24px; }
+  .page-turn-paper { width: 100vw; }
+}
+@media (max-width: 500px) {
+  .hero { width: calc(100% - 30px); }
+  .hero-art { min-height: 405px; }
+  .hero-art.is-opening .book-illustration { transform: rotateY(-93deg); }
+  .hero h1 { font-size: clamp(40px, 11.1vw, 56px); line-height: 1.12; }
+  .hero-description { font-size: 14px; line-height: 1.7; }
+  .eyebrow { font-size: 9px; letter-spacing: .14em; }
+  .book-illustration, .book-reveal { width: min(270px, 75vw); height: min(380px, 105vw); }
+  .book-under-page { width: min(260px,72vw); height: min(380px,105vw); }
+  .book-illustration { padding: 18px; }
+  .book-title { font-size: clamp(30px,9vw,36px); }
+  .flower-top { right: 0; }
+  .flower-bottom { left: 0; }
+  .chapter-tag { letter-spacing: .11em; }
+  .note-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+  .flip-note:nth-child(n) { transform: none; }
+  .flip-note, .flip-note-inner { height: 208px; min-height: 208px; }
+  .flip-back > span:first-child { font-size: clamp(13px,3.8vw,15px); line-height: 1.45; }
+  .clocks { min-width: 0; }
+  .envelope-button { max-width: 100%; }
+  .actual-letter { width: 100%; padding: 27px 23px; }
+  .chapter-next { flex-wrap: wrap; gap: 7px; font-size: 11px; justify-content: center; max-width: calc(100% - 25px); }
+  .chapter-next strong { font-size: 15px; }
+}
+@media (max-width: 355px) {
+  .site-mark { font-size: 10px; }
+  .header-end { letter-spacing: 0; }
+  .note-grid { grid-template-columns: 1fr; max-width: 270px; }
+  .flip-note, .flip-note-inner { height: 176px; min-height: 176px; }
+  .flip-back > span:first-child { font-size: 15px; }
+  .hero h1 { font-size: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-note .flip-face:not([hidden]) { animation: none; }
+  .page-turn-overlay.is-turning { display: none; }
+}
