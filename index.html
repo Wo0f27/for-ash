@@ -4,68 +4,57 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f4eee3">
-  <meta name="description" content="A little birthday storybook made for a friend across the miles.">
+  <meta name="description" content="An interactive birthday storybook for a friend across the miles.">
   <meta name="robots" content="noindex,nofollow">
-  <title>The Pages Between Us · For Ash</title>
+  <title>The Pages Between Us · A Birthday Story</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
+  <!-- MIT-licensed StPageFlip 2.0.7, pinned to one version. -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js" defer></script>
   <script src="config.js" defer></script>
-  <script src="script.js?v=9" defer></script>
+  <script src="script.js?v=10" defer></script>
 </head>
 <body>
   <main class="storybook-app" id="app">
     <header class="masthead">
       <div class="masthead-name"><span aria-hidden="true">✦</span><span>the pages between us</span></div>
-      <div class="masthead-date">FOR <span data-recipient>Ash</span> · 07 NOV</div>
+      <div class="masthead-right">
+        <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" aria-label="Play gentle background music"><span aria-hidden="true">♫</span><span id="music-label">Music off</span></button>
+        <div class="masthead-date">FOR <span data-recipient>Ash</span> · 07 NOV</div>
+      </div>
     </header>
 
-    <div class="book-area">
-      <div class="book-backdrop backdrop-a" aria-hidden="true">✳</div>
-      <div class="book-backdrop backdrop-b" aria-hidden="true">❀</div>
-      <div class="book-shell is-closed" id="book" aria-label="Interactive birthday storybook">
-        <div class="book-edge" aria-hidden="true"></div>
-        <div class="paper-surface" aria-hidden="true"></div>
-
-        <div class="book-page book-left" id="page-left" aria-hidden="true"></div>
-        <div class="book-page book-right" id="page-right" aria-hidden="true"></div>
-        <div class="book-gutter" aria-hidden="true"></div>
-        <div class="turn-leaf" id="turn-leaf" aria-hidden="true">
-          <div class="turn-leaf-face leaf-front" id="leaf-front"></div>
-          <div class="turn-leaf-face leaf-back" id="leaf-back"></div>
-        </div>
-
-        <button class="book-cover" id="book-cover" type="button" aria-label="Open the birthday storybook">
-          <span class="cover-face cover-outside">
-            <span class="cover-inner-border">
-              <span class="cover-flourish cover-top" aria-hidden="true">✧ · ❀ · ✧</span>
-              <span class="cover-middle">
-                <span class="cover-kicker">A BIRTHDAY STORY</span>
-                <span class="cover-small-line" aria-hidden="true"></span>
-                <span class="cover-title">the pages<br><i>between</i><br>us</span>
-                <span class="cover-small-line" aria-hidden="true"></span>
-                <span class="cover-for">FOR <span data-recipient>Ash</span> · NOVEMBER SEVENTH</span>
-              </span>
-              <span class="cover-flourish cover-bottom" aria-hidden="true">❦</span>
-            </span>
-            <span class="cover-click-hint">tap this cover to open <span aria-hidden="true">✧</span></span>
-          </span>
-          <span class="cover-face cover-inside" aria-hidden="true"><span>for the stories<br>still to come ♡</span></span>
-        </button>
-      </div>
+    <section class="book-area" aria-label="Birthday story">
+      <span class="book-backdrop backdrop-a" aria-hidden="true">✳</span>
+      <span class="book-backdrop backdrop-b" aria-hidden="true">❀</span>
+      <div class="book-shell" id="book" aria-label="Interactive page-turning book"></div>
+    </section>
+    <div class="book-progress" aria-live="polite">
+      <div class="progress-label" id="progress-label">Tap the cover to begin</div>
+      <div class="progress-dots" id="progress-dots" aria-hidden="true"></div>
     </div>
-
-    <nav class="book-controls" aria-label="Book navigation">
-      <div class="book-progress">
-        <div class="progress-label" id="progress-label" aria-live="polite">A story for you</div>
-        <div class="progress-dots" id="progress-dots" aria-hidden="true"></div>
-      </div>
-    </nav>
-    <p class="book-instructions" id="book-instructions">Tap the cover to open. Then tap the left or right half of the paper to turn pages.</p>
+    <p class="book-instructions" id="book-instructions">Tap the right half to continue, the left half to go back, or swipe across the paper.</p>
   </main>
 
+  <template id="page-cover">
+    <div class="cover-outside">
+      <span class="cover-inner-border">
+        <span class="cover-flourish cover-top" aria-hidden="true">✧ · ❀ · ✧</span>
+        <span class="cover-middle">
+          <span class="cover-kicker">A BIRTHDAY STORY</span>
+          <span class="cover-small-line"></span>
+          <span class="cover-title">the pages<br><i>between</i><br>us</span>
+          <span class="cover-small-line"></span>
+          <span class="cover-for">FOR <span data-recipient>Ash</span> · NOVEMBER SEVENTH</span>
+        </span>
+        <span class="cover-flourish cover-bottom" aria-hidden="true">❦</span>
+      </span>
+      <span class="cover-click-hint">tap to open the story ✧</span>
+    </div>
+  </template>
   <template id="page-intro">
     <div class="page-content page-intro">
       <div class="folio-label">A LETTER IN THE FORM OF A BOOK</div>
@@ -126,11 +115,13 @@
       <h2>Something<br><em>for you to read.</em></h2>
       <p class="page-lead">Some things deserve more than a passing notification.</p>
       <div class="letter-world" data-letter-world>
-        <!-- Layered like a real envelope: the paper rises behind the pocket,
-             while the flap folds back. Only the paper is readable/clickable. -->
-        <div class="env-back" aria-hidden="true"></div>
-        <div class="env-flap" aria-hidden="true"></div>
-        <div class="letter-sheet" data-letter-sheet role="button" tabindex="-1" aria-label="Tap letter to fold it into the envelope" aria-hidden="true">
+        <!-- zspxx-inspired pocket layers; the paper stays INSIDE the pocket until extracted. -->
+        <div class="letter-envelope" aria-hidden="true">
+          <div class="env-back"></div>
+          <div class="env-flap"></div>
+          <div class="env-stamp">♡</div>
+        </div>
+        <div class="letter-sheet" data-letter-sheet role="button" tabindex="-1" aria-label="Tap letter to return it to the envelope" aria-hidden="true">
           <div class="sheet-inner">
             <small>November 7, <span data-year>2026</span></small>
             <h3>Dear <span data-recipient>Ash</span>,</h3>
@@ -139,8 +130,7 @@
           </div>
         </div>
         <div class="env-front" aria-hidden="true"></div>
-        <div class="env-stamp" aria-hidden="true">♡</div>
-        <button class="letter-tap-zone" data-letter-toggle type="button" aria-label="Open the birthday letter"><span aria-hidden="true">♡</span><span data-letter-label>Tap the envelope to open</span></button>
+        <button class="letter-tap-zone" data-letter-toggle type="button" aria-label="Open the birthday letter"><span class="sr-only">Open the envelope</span></button>
       </div>
       <p class="page-aside letter-aside">Once it's open, tap the paper again to put it back.</p>
     </div>
@@ -173,6 +163,11 @@
 
   <template id="page-blank">
     <div class="page-content page-blank"><span class="blank-ornament">❦</span><span>fin.</span></div>
+  </template>
+  <template id="page-back-cover">
+    <div class="cover-outside cover-rear">
+      <span class="cover-inner-border"><span class="cover-flourish">✧ ❀ ✧</span><span class="rear-message">for the stories<br>still to come ♡</span><span class="cover-flourish">❦</span></span>
+    </div>
   </template>
 </body>
 </html>

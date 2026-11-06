@@ -1,39 +1,29 @@
-# The Pages Between Us — v9: direct page taps and physical envelope
+# The Pages Between Us — Version 10
 
-A birthday gift for a long-distance friend, hosted on GitHub Pages. This version replaces the scrolling chapters with a real book reader.
+An interactive birthday book hosted on GitHub Pages. The **page curvature and turning** use [StPageFlip v2.0.7](https://github.com/Nodlik/StPageFlip) (MIT license, pinned to a specific jsDelivr bundle). On mobile it displays a single page, and on wider screens it can display a spread. The cover is now the first hard page within the same engine; the previous hand-coded 3D flip was removed.
 
-## How to experience it
+The **envelope animation** uses a custom implementation of the pocket/flap/paper layering inspired by [zspxx/animated-envelope](https://github.com/zspxx/animated-envelope) (MIT), which itself credits Josh Nichols' [CSS base](https://codepen.io/MrBlank/pen/JjXxovL). Our layout, dimensions and interactions are adapted to fit the birthday book rather than copied wholesale.
 
-- Tap the green cover to open the storybook. It **stays in place**—there is no scroll jump.
-- Desktop (wide screens): two pages are visible at once, and turning a sheet swings it from right to left (or back from left to right).
-- Phones: one large, readable page is visible; the page itself turns horizontally.
-- Tap the **right half** of the book to move forward and the **left half** to go backward. Swipe horizontally or use the keyboard arrow keys as alternatives. There are no next/previous buttons.
-- Each page scrolls **inside its own paper** when content is longer than the available screen. This is especially important for a personal letter.
-- The memory-note cards reveal in place on first tap. The envelope opens into a paper letter on the same book page; tap the paper itself to put it back. The birthday cake candles extinguish and reveal the configured wish.
-- Reduced-motion preferences skip the turning animation without losing content.
+## Interactions
+
+- Tap the right or left half of the book to turn forward or back, or swipe; tapping a memory card, envelope, letter, link or birthday button won't change pages.
+- The paper emerges **behind** the front pocket after the flap opens, then rises over it. Tap the paper again to return it. Long letters scroll inside the paper.
+- Use the **Music off** control to enable an **original, quiet ambient instrumental** synthesized with the Web Audio API. It is off by default, never autoplays, and can be stopped at any time. It pauses when the tab is hidden. No commercial music or copyrighted recording is embedded.
+- If you own or have permission to use a music file, you can add `musicUrl: "assets/music.mp3",` to the existing `window.BIRTHDAY_CONFIG` object in `config.js` and upload the file to the repository. The music control will then play that file, looping, instead of synthesized sounds. **Music still requires the visitor's tap** because phones block autoplay.
+- If the page-flip bundle cannot load, a simplified (non-animated) book remains usable. The bundle is loaded from a pinned CDN URL; no frameworks or build tooling are required.
 
 ## Personalize
 
-Edit **config.js**. The birthday message and letter paragraphs are placeholders that belong to the sender. `config.js` intentionally remains unchanged from earlier versions.
+Edit `config.js` to provide your own letter paragraphs and birthday wish. The repository's existing `config.js` remains unchanged by this update.
 
 ## Deployment
 
-GitHub Pages uses the files in the root of the `main` branch: `index.html`, `styles.css`, `script.js`, `config.js`, `favicon.svg`, and `.nojekyll`.
-No build tooling or services are needed. Enable or review GitHub Pages at **Settings → Pages → Deploy from a branch → main → /(root)**.
+GitHub Pages serves the files in the root of `main`. The site URL is https://wo0f27.github.io/for-ash/.
 
-Published URL: https://wo0f27.github.io/for-ash/
+## License / attribution
 
-**Privacy:** This public site should not contain sensitive private messages or contact information. The `noindex` meta tag is not access protection.
+- **StPageFlip** © Oleg Litovskiy, licensed MIT. Original source: https://github.com/Nodlik/StPageFlip . The website loads its official browser build via jsDelivr.
+- **Animated Envelope** © its contributors, licensed MIT. Original source: https://github.com/zspxx/animated-envelope . It credits Josh Nichols' MIT CSS base. This website borrows the concept of layered envelope construction, not its content, color palette, or confetti assets.
+- Original HTML, CSS, and JavaScript written for this personal birthday website, except the above attributed techniques and third-party page-flip engine.
 
-## V8 repair notes
-
-- Portrait turns now use the same **left binding** going forward and backward. Previous-page animation returns from the left rather than swinging around the right edge.
-- A page turn has one continuous hinge rotation, no keyframe pause at 50%, and completes on the matching page animation event.
-- The letter is fully hidden under its envelope before opening; it is revealed after the flap starts moving.
-- Evaluated MIT-licensed [StPageFlip](https://github.com/Nodlik/StPageFlip) and [grabfold](https://github.com/javocsoft/grabfold) as alternative engines. This scoped fix has no added runtime dependencies and preserves the existing inside-page interactive content.
-
-## V9 open-source and interaction notes
-
-- The page arrows were intentionally removed; progress dots and page count remain. Left/right book-half taps navigate unless the tap hits a real interactive element (memory note, envelope, paper, cake, link, or restart). Normal vertical reading scroll and horizontal swipes remain supported.
-- Reworked the letter as layered stationery, with the actual paper **between the envelope back and its front pocket** until the extraction passes the pocket. Flap and paper motion are sequenced, and the paper still closes by being tapped again.
-- Referenced [yuktrium/3D-Love-Letter](https://github.com/yuktrium/3D-Love-Letter) (MIT) for the physical layering and opening-order concept. The CSS was reauthored to fit the existing storybook, without copying its images or introducing runtime dependencies. Other candidates reviewed were [zspxx/animated-envelope](https://github.com/zspxx/animated-envelope) (MIT) and [its-aleezA/heart-envelope-animation](https://github.com/its-aleezA/heart-envelope-animation) (MIT/GSAP).
+**Privacy:** GitHub Pages is publicly accessible. The `noindex` meta tag discourages indexing but is not access control. Do not include private messages without consent.

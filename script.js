@@ -1,391 +1,380 @@
 (() => {
   'use strict';
   const cfg = window.BIRTHDAY_CONFIG || {};
+  const book = document.getElementById('book');
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-  const pages = [
-    { id: 'intro', name: 'The beginning' },
-    { id: 'origin', name: 'Once upon a Wattpad' },
-    { id: 'notes', name: 'Familiar chaos' },
-    { id: 'distance', name: 'Across the miles' },
-    { id: 'letter', name: 'A letter for you' },
-    { id: 'birthday', name: 'A birthday wish' },
-    { id: 'ending', name: 'To be continued' }
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const pageDefs = [
+    ['cover', 'The cover'],
+    ['intro', 'A little dedication'],
+    ['origin', 'Once upon a Wattpad'],
+    ['notes', 'Familiar chaos'],
+    ['distance', 'Across the miles'],
+    ['letter', 'A letter for you'],
+    ['birthday', 'A birthday wish'],
+    ['ending', 'To be continued'],
+    ['back-cover', 'The back cover']
   ];
-  const book = $('#book');
-  const cover = $('#book-cover');
-  const leaf = $('#turn-leaf');
-  const leafFront = $('#leaf-front');
-  const leafBack = $('#leaf-back');
-  const left = $('#page-left');
-  const right = $('#page-right');
-  const progress = $('#progress-label');
-  const dots = $('#progress-dots');
-  const instructions = $('#book-instructions');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const smallScreen = window.matchMedia('(max-width: 850px)');
-
-  let current = 0;
-  let isOpen = false;
-  let turning = false;
-  let isMobile = smallScreen.matches;
-  let lastPointer = null;
-  let letterPointer = null;
-  let confettiTimer = null;
-  let resizeTimer = null;
-  let tapPointer = null;
-  let suppressPageTap = false;
+  let pageFlip = null;
+  let fallbackPage = 0;
   const revealedNotes = new Set();
   let letterOpen = false;
+  let letterExtracted = false;
+  let letterFolding = false;
+  let letterTimer = 0;
   let wishMade = false;
+  let pointerStart = null;
+  let letterPointer = null;
+  let confettiTimer = 0;
+  let lastTurn = 0;
 
   document.title = `The Pages Between Us · For ${cfg.recipientName || 'Ash'}`;
+  const nameTargets = document.querySelectorAll('[data-recipient]');
+  nameTargets.forEach(el => { el.textContent = cfg.recipientName || 'Ash'; });
 
-  function applyNames(root) {
-    $$('[data-recipient]', root).forEach(el => { el.textContent = cfg.recipientName || 'Ash'; });
-    $$('[data-sender]', root).forEach(el => { el.textContent = cfg.senderName || 'Your friend'; });
-    $$('[data-year]', root).forEach(el => { el.textContent = cfg.birthdayYear || '2026'; });
-    $$('[data-friend-location]', root).forEach(el => { el.textContent = (cfg.friendLocation || 'Italy').toUpperCase(); });
+  function populateNames(node) {
+    $$('[data-recipient]', node).forEach(el => { el.textContent = cfg.recipientName || 'Ash'; });
+    $$('[data-sender]', node).forEach(el => { el.textContent = cfg.senderName || 'Your friend'; });
+    $$('[data-year]', node).forEach(el => { el.textContent = cfg.birthdayYear || '2026'; });
+    $$('[data-friend-location]', node).forEach(el => { el.textContent = (cfg.friendLocation || 'Italy').toUpperCase(); });
   }
-  applyNames(document);
 
-  function makeMemoryCards(root) {
-    const grid = $('[data-memory-grid]', root);
+  function buildCards(node) {
+    const grid = $('[data-memory-grid]', node);
     if (!grid) return;
-    const notes = Array.isArray(cfg.notes) && cfg.notes.length ? cfg.notes : [{icon:'✦',title:'A little note',subtitle:'tap to reveal',reveal:'A story worth keeping.'}];
-    grid.replaceChildren();
+    const notes = Array.isArray(cfg.notes) ? cfg.notes : [];
     notes.forEach((note, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'memory-card';
-      button.dataset.card = String(index);
-      button.setAttribute('aria-pressed', String(revealedNotes.has(index)));
-      button.setAttribute('aria-label', `${revealedNotes.has(index) ? 'Hide' : 'Reveal'}: ${note.title || 'a note'}`);
-      const front = document.createElement('span');
-      front.className = 'card-front';
-      const icon = document.createElement('span'); icon.className = 'card-symbol'; icon.textContent = String(note.icon || '✿');
-      const name = document.createElement('strong'); name.textContent = String(note.title || 'A note');
-      const hint = document.createElement('small'); hint.textContent = String(note.subtitle || 'tap to reveal');
-      front.append(icon,name,hint);
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'memory-card';
+      card.dataset.card = String(index);
+      card.setAttribute('aria-label', `Reveal ${note.title || 'a memory'}`);
+      const front = document.createElement('span'); front.className = 'card-front';
+      const icon = document.createElement('span'); icon.className = 'card-symbol'; icon.textContent = note.icon || '✿';
+      const title = document.createElement('strong'); title.textContent = note.title || 'A little note';
+      const subtitle = document.createElement('small'); subtitle.textContent = note.subtitle || 'tap to reveal';
+      front.append(icon, title, subtitle);
       const back = document.createElement('span'); back.className = 'card-back';
-      const message = document.createElement('span'); message.textContent = String(note.reveal || '');
-      const returnHint = document.createElement('small'); returnHint.textContent = 'tap to turn back ↶';
-      back.append(message,returnHint);
-      button.classList.toggle('is-revealed',revealedNotes.has(index));
-      front.hidden = revealedNotes.has(index);
-      back.hidden = !revealedNotes.has(index);
-      button.append(front,back);
-      grid.append(button);
+      const message = document.createElement('span'); message.textContent = note.reveal || '';
+      const hint = document.createElement('small'); hint.textContent = 'tap to turn back ↶';
+      back.append(message, hint);
+      card.append(front, back);
+      grid.append(card);
     });
   }
 
-  function prepareLetter(root) {
-    const prose = $('[data-letter-paragraphs]', root);
+  function buildLetter(node) {
+    const prose = $('[data-letter-paragraphs]', node);
     if (!prose) return;
-    const paragraphs = Array.isArray(cfg.letterParagraphs) ? cfg.letterParagraphs : [];
-    paragraphs.forEach(text => {
+    (Array.isArray(cfg.letterParagraphs) ? cfg.letterParagraphs : []).forEach(paragraph => {
       const p = document.createElement('p');
-      p.textContent = String(text);
+      p.textContent = String(paragraph);
       prose.append(p);
     });
-    const world = $('[data-letter-world]', root);
-    const sheet = $('[data-letter-sheet]', world);
-    world.classList.toggle('is-open',letterOpen);
-    sheet.setAttribute('aria-hidden',String(!letterOpen));
-    sheet.tabIndex = letterOpen ? 0 : -1;
-    const toggle = $('[data-letter-toggle]', root);
-    toggle.setAttribute('aria-expanded',String(letterOpen));
-    toggle.setAttribute('aria-label',letterOpen ? 'Put the birthday letter back' : 'Open the birthday letter');
   }
 
-  function prepareCake(root) {
-    const scene = $('[data-cake-scene]',root);
-    if (!scene) return;
-    scene.classList.toggle('candles-out',wishMade);
-    const button = $('[data-wish-button]',root);
-    button.textContent = wishMade ? 'Light the candles again ↺' : 'Make a wish & blow out the candles ✳';
-    const wish = $('[data-birthday-wish]',root);
-    wish.hidden = !wishMade;
-    wish.textContent = cfg.birthdayWish || '[Add your final birthday wish in config.js.]';
-  }
-
-  function renderInto(index, holder) {
-    holder.replaceChildren();
-    const pageData = pages[index] || { id:'blank', name:'' };
-    const template = $(`#page-${pageData.id}`);
-    if (!template) return;
-    const inner = document.createElement('div');
-    inner.className = 'page-inner';
-    const scroll = document.createElement('div');
-    scroll.className = 'page-scroll';
-    scroll.append(template.content.cloneNode(true));
-    inner.append(scroll);
-    holder.append(inner);
-    applyNames(holder);
-    makeMemoryCards(holder);
-    prepareLetter(holder);
-    prepareCake(holder);
-  }
-
-  function renderStationary(index) {
-    if (isMobile) {
-      left.replaceChildren();
-      renderInto(index,right);
+  // Each page is a live HTML sheet. The StPageFlip library animates the paper.
+  for (let index = 0; index < pageDefs.length; index++) {
+    const [id] = pageDefs[index];
+    const template = document.getElementById(`page-${id}`);
+    const sheet = document.createElement('div');
+    sheet.className = `book-sheet${index === 0 || index === pageDefs.length - 1 ? ' sheet-cover' : ''}`;
+    sheet.dataset.pageIndex = String(index);
+    if (index === 0 || index === pageDefs.length - 1) sheet.dataset.density = 'hard';
+    if (index === 0 || index === pageDefs.length - 1) {
+      sheet.append(template.content.cloneNode(true));
     } else {
-      renderInto(index,left);
-      renderInto(index+1,right);
+      const inner = document.createElement('div'); inner.className = 'page-inner';
+      const scroll = document.createElement('div'); scroll.className = 'page-scroll';
+      scroll.append(template.content.cloneNode(true));
+      inner.append(scroll);
+      sheet.append(inner);
     }
-    tickClocks();
-  }
-
-  function renderControls() {
-    const step = isMobile ? 1 : 2;
-    const total = isMobile ? pages.length : Math.ceil(pages.length / 2);
-    const position = isMobile ? current : Math.floor(current/2);
-    const last = current + step >= pages.length;
-    progress.textContent = isOpen ? `Page ${position + 1} of ${total}` : 'A story for you';
-    instructions.textContent = isOpen ? 'Tap the left half to go back · tap the right half to go forward · or swipe.' : 'Tap the cover to open your book.';
-    dots.replaceChildren();
-    for (let i = 0; i < total; i++) {
-      const dot = document.createElement('span');
-      dot.classList.toggle('active',i===position);
-      dots.append(dot);
-    }
-  }
-
-  function finishOpen() {
-    book.classList.remove('is-opening','is-closed');
-    isOpen = true;
-    turning = false;
-    renderControls();
-    cover.blur();
-  }
-
-  function openBook() {
-    if (isOpen || turning) return;
-    turning = true;
-    book.classList.add('is-opening');
-    renderStationary(0);
-    if (prefersReducedMotion.matches) { finishOpen(); return; }
-    let done = false;
-    const complete = () => { if (done) return; done = true; finishOpen(); };
-    cover.addEventListener('animationend',e => { if (e.animationName === 'coverOpen') complete(); },{once:true});
-    setTimeout(complete,1350);
-  }
-
-  // The paper's back is a real second face. The static destination underneath
-  // is prepared BEFORE animation, then committed only once the turn finishes.
-  function turnPage(direction) {
-    if (!isOpen || turning) return;
-    const step = isMobile ? 1 : 2;
-    const target = current + direction*step;
-    if (target < 0 || target >= pages.length) return;
-    if (prefersReducedMotion.matches) {
-      current = target;
-      renderStationary(current);
-      renderControls();
-      return;
-    }
-    turning = true;
-    renderControls();
-    leaf.className = 'turn-leaf';
-    leafFront.replaceChildren();
-    leafBack.replaceChildren();
-
-    if (direction > 0) {
-      if (isMobile) {
-        renderInto(current,leafFront);
-        renderInto(target,leafBack);
-        renderInto(target,right);
-      } else {
-        renderInto(current+1,leafFront);
-        renderInto(target,leafBack);
-        renderInto(target+1,right);
-      }
-    } else if (isMobile) {
-      /* Reverse in portrait restores a page FROM the left binding.
-         The destination is on the FRONT of the returning sheet; the current
-         page remains underneath until the full 180° turn completes. */
-      renderInto(target,leafFront);
-      renderInto(current,leafBack);
-      // Do not replace the visible page early (it would flash at mid-turn).
-    } else {
-      renderInto(current,leafFront);
-      renderInto(target+1,leafBack);
-      renderInto(target,left);
-    }
-    tickClocks();
-    book.classList.add('is-turning');
-    const cls = direction > 0 ? 'is-forward' : 'is-backward';
-    void leaf.offsetWidth;
-    leaf.classList.add(cls);
-
-    let finished = false;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      current = target;
-      renderStationary(current);
-      leaf.className = 'turn-leaf';
-      leafFront.replaceChildren();
-      leafBack.replaceChildren();
-      book.classList.remove('is-turning');
-      turning = false;
-      renderControls();
-    };
-    let safetyTimeout = null;
-    const onEnd = event => {
-      if (event.target !== leaf || !['turnForward','turnBackward','turnBackwardPortrait'].includes(event.animationName)) return;
-      leaf.removeEventListener('animationend',onEnd);
-      clearTimeout(safetyTimeout);
-      finish();
-    };
-    leaf.addEventListener('animationend',onEnd);
-    /* Safety net only; finish on the actual leaf animation, not its child
-       shading or an arbitrary half-way timer. */
-    safetyTimeout = setTimeout(() => {
-      leaf.removeEventListener('animationend',onEnd);
-      finish();
-    }, 1500);
+    populateNames(sheet);
+    buildCards(sheet);
+    buildLetter(sheet);
+    book.append(sheet);
   }
 
   function timeIn(zone) {
-    try { return new Intl.DateTimeFormat('en-GB',{timeZone:zone,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()); }
-    catch { return '--:--'; }
+    try {
+      return new Intl.DateTimeFormat('en-GB', {
+        timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+      }).format(new Date());
+    } catch (_) { return '--:--'; }
   }
-  function tickClocks() {
-    $$('[data-clock="ph"]',book).forEach(el => { el.textContent = timeIn(cfg.yourTimeZone || 'Asia/Manila'); });
-    $$('[data-clock="it"]',book).forEach(el => { el.textContent = timeIn(cfg.friendTimeZone || 'Europe/Rome'); });
+  function refreshClocks() {
+    $$('[data-clock="ph"]', book).forEach(el => { el.textContent = timeIn(cfg.yourTimeZone || 'Asia/Manila'); });
+    $$('[data-clock="it"]', book).forEach(el => { el.textContent = timeIn(cfg.friendTimeZone || 'Europe/Rome'); });
   }
-
-  function updateLetter() {
-    $$('[data-letter-world]',book).forEach(world => {
-      world.classList.toggle('is-open',letterOpen);
-      const paper = $('[data-letter-sheet]',world);
-      const toggle = $('[data-letter-toggle]',world);
-      paper.tabIndex = letterOpen ? 0 : -1;
-      paper.setAttribute('aria-hidden',String(!letterOpen));
-      toggle.setAttribute('aria-expanded',String(letterOpen));
-      toggle.setAttribute('aria-label',letterOpen ? 'Put the letter back' : 'Open the birthday letter');
-      if (!letterOpen) paper.scrollTop = 0;
+  function syncCards() {
+    $$('[data-card]', book).forEach(card => {
+      const open = revealedNotes.has(Number(card.dataset.card));
+      card.classList.toggle('is-revealed', open);
+      $('.card-front', card).hidden = open;
+      $('.card-back', card).hidden = !open;
+      card.setAttribute('aria-pressed', String(open));
     });
   }
-
-  function makeConfetti(root) {
-    const layer = $('[data-confetti]',root);
-    if (!layer || prefersReducedMotion.matches) return;
+  function syncLetter() {
+    $$('[data-letter-world]', book).forEach(world => {
+      world.classList.toggle('is-open', letterOpen);
+      world.classList.toggle('is-extracted', letterExtracted && letterOpen);
+      world.classList.toggle('is-folding', letterFolding);
+      const sheet = $('[data-letter-sheet]', world);
+      sheet.tabIndex = letterOpen ? 0 : -1;
+      sheet.setAttribute('aria-hidden', String(!letterOpen));
+      const toggle = $('[data-letter-toggle]', world);
+      toggle.setAttribute('aria-expanded', String(letterOpen));
+      toggle.setAttribute('aria-label', letterOpen ? 'Return letter to envelope' : 'Open letter');
+      if (!letterOpen) sheet.scrollTop = 0;
+    });
+  }
+  function setLetter(open) {
+    if (letterFolding) return;
+    clearTimeout(letterTimer);
+    if (open) {
+      letterOpen = true;
+      letterExtracted = false;
+      syncLetter();
+      letterTimer = setTimeout(() => {
+        if (!letterOpen || letterFolding) return;
+        letterExtracted = true; // The folded paper has cleared the pocket.
+        syncLetter();           // It may now unfold in front without an overlap jump.
+      }, reducedMotion.matches ? 0 : 980);
+    } else {
+      letterFolding = true;
+      letterExtracted = false; // Fold first, without crossing the front pocket.
+      syncLetter();
+      letterTimer = setTimeout(() => {
+        letterOpen = false;     // Then tuck the folded card into the envelope.
+        letterFolding = false;
+        syncLetter();
+      }, reducedMotion.matches ? 0 : 475);
+    }
+  }
+  function syncCake() {
+    $$('[data-cake-scene]', book).forEach(scene => scene.classList.toggle('candles-out', wishMade));
+    $$('[data-wish-button]', book).forEach(button => {
+      button.textContent = wishMade ? 'Light the candles again ↺' : 'Make a wish & blow out the candles ✳';
+    });
+    $$('[data-birthday-wish]', book).forEach(el => {
+      el.hidden = !wishMade;
+      el.textContent = cfg.birthdayWish || '[Add your final birthday wish in config.js.]';
+    });
+  }
+  function confetti(root) {
+    const layer = $('[data-confetti]', root);
+    if (!layer || reducedMotion.matches) return;
     layer.replaceChildren();
-    const chars=['✧','✦','♡','•'];
-    for(let i=0;i<24;i++) {
-      const piece=document.createElement('span');
-      piece.className='confetti-piece';
-      piece.textContent=chars[i%chars.length];
-      piece.style.color=['#c3a071','#b8797a','#7e9c8a'][i%3];
-      piece.style.setProperty('--x',`${Math.floor(Math.random()*300-150)}px`);
-      piece.style.setProperty('--y',`${Math.floor(Math.random()*-210-25)}px`);
-      piece.style.setProperty('--rot',`${Math.floor(Math.random()*450-225)}deg`);
-      piece.style.setProperty('--delay',`${Math.random()*.24}s`);
+    const glyphs = ['✧', '✦', '♡', '•'];
+    for (let i = 0; i < 24; i++) {
+      const piece = document.createElement('span');
+      piece.className = 'confetti-piece';
+      piece.textContent = glyphs[i % glyphs.length];
+      piece.style.color = ['#c3a071', '#b8797a', '#7e9c8a'][i % 3];
+      piece.style.setProperty('--x', `${Math.round(Math.random() * 300 - 150)}px`);
+      piece.style.setProperty('--y', `${Math.round(Math.random() * -210 - 25)}px`);
+      piece.style.setProperty('--rot', `${Math.round(Math.random() * 450 - 225)}deg`);
+      piece.style.setProperty('--delay', `${Math.random() * .24}s`);
       layer.append(piece);
     }
     clearTimeout(confettiTimer);
-    confettiTimer=setTimeout(()=>layer.replaceChildren(),1900);
+    confettiTimer = setTimeout(() => layer.replaceChildren(), 2200);
   }
 
-  // Delegation survives page re-rendering and guarantees one-tap card updates.
-  book.addEventListener('click',event=>{
-    if (turning || suppressPageTap || !isOpen) return;
-    const card=event.target.closest('[data-card]');
-    if(card) {
-      const id=Number(card.dataset.card);
-      if(revealedNotes.has(id)) revealedNotes.delete(id); else revealedNotes.add(id);
-      $$(`[data-card="${id}"]`,book).forEach(button=>{
-        const open=revealedNotes.has(id);
-        button.classList.toggle('is-revealed',open);
-        $('.card-front',button).hidden=open;
-        $('.card-back',button).hidden=!open;
-        button.setAttribute('aria-pressed',String(open));
+  function currentIndex() {
+    return pageFlip ? pageFlip.getCurrentPageIndex() : fallbackPage;
+  }
+  function updateProgress(index = currentIndex()) {
+    index = Math.max(0, Math.min(index, pageDefs.length - 1));
+    $('#progress-label').textContent = pageDefs[index][1];
+    const dots = $('#progress-dots');
+    dots.replaceChildren();
+    pageDefs.forEach((_, i) => {
+      const dot = document.createElement('span');
+      dot.classList.toggle('active', i === index);
+      dots.append(dot);
+    });
+    refreshClocks();
+    syncCards(); syncLetter(); syncCake();
+  }
+
+  function flip(direction) {
+    const index = currentIndex();
+    if (direction > 0 && index >= pageDefs.length - 1) return;
+    if (direction < 0 && index <= 0) return;
+    if (Date.now() - lastTurn < 420) return;
+    lastTurn = Date.now();
+    if (pageFlip) {
+      if (reducedMotion.matches) {
+        if (direction > 0) pageFlip.turnToNextPage();
+        else pageFlip.turnToPrevPage();
+      } else if (direction > 0) pageFlip.flipNext('bottom');
+      else pageFlip.flipPrev('bottom');
+    } else {
+      fallbackPage += direction;
+      $$('.book-sheet', book).forEach((sheet, i) => sheet.classList.toggle('fallback-active', i === fallbackPage));
+      updateProgress();
+    }
+  }
+
+  // The sheet is never handed to StPageFlip when the user interacts with its content.
+  // Avoid interpreting a vertical letter scroll as an attempt to flip the book.
+  const interactiveSelector = 'button, a, [role="button"], input, textarea, select, [data-letter-world], [data-memory-grid], [data-cake-scene], .mystery-note, .ending-action';
+  function interactive(target) { return !!target.closest(interactiveSelector); }
+  book.addEventListener('click', event => {
+    const card = event.target.closest('[data-card]');
+    if (card) {
+      const id = Number(card.dataset.card);
+      if (revealedNotes.has(id)) revealedNotes.delete(id); else revealedNotes.add(id);
+      syncCards();
+      return;
+    }
+    if (event.target.closest('[data-letter-toggle]')) {
+      setLetter(!letterOpen);
+      return;
+    }
+    if (event.target.closest('[data-letter-sheet]') && letterOpen) {
+      if (letterPointer && Math.hypot(event.clientX - letterPointer.x, event.clientY - letterPointer.y) > 14) return;
+      setLetter(false);
+      return;
+    }
+    if (event.target.closest('[data-wish-button]')) {
+      wishMade = !wishMade;
+      syncCake();
+      if (wishMade) confetti(event.target.closest('.page-content'));
+      return;
+    }
+    if (event.target.closest('[data-restart]')) {
+      if (pageFlip) pageFlip.flip(0, 'bottom');
+      else { fallbackPage = 0; updateProgress(); }
+      return;
+    }
+  });
+  book.addEventListener('pointerdown', event => {
+    const sheet = event.target.closest('[data-letter-sheet]');
+    letterPointer = sheet ? { x: event.clientX, y: event.clientY } : null;
+    if (interactive(event.target) || event.button !== 0 || !event.isPrimary) { pointerStart = null; return; }
+    const scroll = event.target.closest('.page-scroll');
+    pointerStart = { x: event.clientX, y: event.clientY, scroll, scrollTop: scroll ? scroll.scrollTop : 0 };
+  }, {passive:true});
+  book.addEventListener('pointerup', event => {
+    if (!pointerStart || interactive(event.target)) { pointerStart = null; return; }
+    const {x, y, scroll, scrollTop} = pointerStart;
+    pointerStart = null;
+    if (scroll && Math.abs(scroll.scrollTop - scrollTop) > 2) return;
+    const dx = event.clientX - x;
+    const dy = event.clientY - y;
+    if (Math.abs(dy) > 16 && Math.abs(dy) >= Math.abs(dx)) return;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.45) { flip(dx < 0 ? 1 : -1); return; }
+    if (Math.abs(dx) > 15 || Math.abs(dy) > 15) return;
+    const rect = book.getBoundingClientRect();
+    flip(event.clientX >= rect.left + rect.width / 2 ? 1 : -1);
+  }, {passive:true});
+  book.addEventListener('pointercancel', () => { pointerStart = null; });
+  book.addEventListener('keydown', event => {
+    if (event.target.matches('[data-letter-sheet]') && ['Enter',' '].includes(event.key)) {
+      event.preventDefault();
+      setLetter(false);
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey || interactive(event.target)) return;
+    if (event.key === 'ArrowRight') { event.preventDefault(); flip(1); }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); flip(-1); }
+  });
+
+  // StPageFlip 2.0.7 (MIT) handles page curvature, gutter and bidirectional folds.
+  // Its built-in click/touch navigation is disabled to protect nested scrollable content.
+  if (window.St && St.PageFlip) {
+    try {
+      pageFlip = new St.PageFlip(book, {
+        width: 430, height: 610, size: 'stretch',
+        minWidth: 260, maxWidth: 530, minHeight: 390, maxHeight: 760,
+        drawShadow: true, maxShadowOpacity: .25,
+        flippingTime: 1050, usePortrait: true, showCover: true,
+        mobileScrollSupport: false, autoSize: false,
+        useMouseEvents: false, clickEventForward: true,
+        disableFlipByClick: true
       });
-      return;
+      pageFlip.on('flip', event => updateProgress(event.data));
+      pageFlip.on('changeOrientation', () => updateProgress());
+      pageFlip.on('init', event => updateProgress(event.data.page));
+      pageFlip.loadFromHTML($$('.book-sheet', book));
+    } catch (error) {
+      console.error('Page-flip engine initialization failed:', error);
+      pageFlip = null;
     }
-    if(event.target.closest('[data-letter-toggle]')) { letterOpen=!letterOpen; updateLetter(); return; }
-    const letter=event.target.closest('[data-letter-sheet]');
-    if(letter && letterOpen) {
-      if(letterPointer && (Math.abs(event.clientX-letterPointer.x)>15 || Math.abs(event.clientY-letterPointer.y)>15)) return;
-      letterOpen=false; updateLetter(); return;
-    }
-    const wish=event.target.closest('[data-wish-button]');
-    if(wish) {
-      wishMade=!wishMade;
-      $$('[data-cake-scene]',book).forEach(scene=>scene.classList.toggle('candles-out',wishMade));
-      $$('[data-wish-button]',book).forEach(button=>{button.textContent=wishMade?'Light the candles again ↺':'Make a wish & blow out the candles ✳';});
-      $$('[data-birthday-wish]',book).forEach(el=>{el.hidden=!wishMade;el.textContent=cfg.birthdayWish||'[Add your final birthday wish in config.js.]';});
-      if(wishMade) makeConfetti(event.target.closest('.page-content'));
-      return;
-    }
-    if(event.target.closest('[data-restart]')) {
-      current=0; isOpen=false; turning=false;
-      book.classList.add('is-closed');
-      book.classList.remove('is-opening','is-turning');
-      renderStationary(0);renderControls();
-      return;
-    }
-    // Page clicks only; never steal interactions from links, memory cards,
-    // scrollable letters, cake controls or a selected text passage.
-    if (event.target.closest('button,a,[role="button"],input,textarea,select,[contenteditable]')) return;
-    if (event.detail === 0 || (window.getSelection && !window.getSelection().isCollapsed)) return;
-    const bounds = book.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right) return;
-    turnPage(event.clientX < bounds.left + bounds.width / 2 ? -1 : 1);
-  });
+  }
+  if (!pageFlip) {
+    book.classList.add('flip-fallback');
+    $$('.book-sheet',book).forEach((sheet,i)=>sheet.classList.toggle('fallback-active', i===0));
+    $('#book-instructions').textContent = 'Tap the left or right side to read. Page animation is unavailable on this connection.';
+  }
+  updateProgress();
+  setInterval(refreshClocks, 30000);
 
-  book.addEventListener('pointerdown',event=>{
-    const sheet=event.target.closest('[data-letter-sheet]');
-    letterPointer=sheet ? {x:event.clientX,y:event.clientY} : null;
-    tapPointer={x:event.clientX,y:event.clientY,time:performance.now(),pointerId:event.pointerId};
-    suppressPageTap=false;
-    if(!isOpen || turning || event.target.closest('button,a,[role="button"]')) { lastPointer=null;return; }
-    lastPointer={x:event.clientX,y:event.clientY,time:performance.now()};
-  },{passive:true});
-  book.addEventListener('pointerup',event=>{
-    if (tapPointer && event.pointerId === tapPointer.pointerId) {
-      const moved = Math.hypot(event.clientX-tapPointer.x,event.clientY-tapPointer.y)>15;
-      const held = performance.now()-tapPointer.time>850;
-      suppressPageTap = moved || held;
-      tapPointer=null;
-      if (suppressPageTap) setTimeout(()=>{suppressPageTap=false;},180);
+  // Original ambient harmonies, synthesized in-browser. No external audio track
+  // and no autoplay. Visitors start or stop music with an explicit tap.
+  const musicToggle = $('#music-toggle');
+  const musicLabel = $('#music-label');
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let playingMusic = false, audioContext = null, musicTimer = null, trackAudio = null, chordStep = 0;
+  function playChord() {
+    if (!audioContext || audioContext.state !== 'running') return;
+    const chords = [
+      [196, 246.94, 293.66, 369.99],   // G major add 9
+      [174.61, 220, 261.63, 329.63],   // F major 7
+      [164.81, 196, 246.94, 329.63],   // E minor 7
+      [146.83, 196, 220, 293.66]       // D sus add 9
+    ];
+    const start = audioContext.currentTime + .06;
+    const notes = chords[chordStep++ % chords.length];
+    for (const frequency of notes) {
+      const tone = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      tone.type = 'sine'; tone.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(.015, start + .85);
+      gain.gain.setValueAtTime(.015, start + 1.6);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + 4.7);
+      tone.connect(gain); gain.connect(audioContext.destination);
+      tone.start(start); tone.stop(start + 4.8);
     }
-    if(!lastPointer || !isOpen || turning) return;
-    const dx=event.clientX-lastPointer.x;
-    const dy=event.clientY-lastPointer.y;
-    lastPointer=null;
-    if(Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.45) turnPage(dx<0?1:-1);
-  },{passive:true});
-  book.addEventListener('pointercancel',()=>{lastPointer=null;tapPointer=null;suppressPageTap=true;setTimeout(()=>{suppressPageTap=false;},180);});
-  book.addEventListener('keydown',event=>{
-    if(event.target.matches('[data-letter-sheet]') && (event.key==='Enter'||event.key===' ')) {
-      event.preventDefault();letterOpen=false;updateLetter();
+  }
+  async function setMusic(enabled) {
+    if (enabled) {
+      try {
+        if (typeof cfg.musicUrl === 'string' && cfg.musicUrl.trim()) {
+          trackAudio = new Audio(cfg.musicUrl.trim());
+          trackAudio.loop = true; trackAudio.volume = .24;
+          await trackAudio.play();
+        } else {
+          if (!AC) throw new Error('Web Audio unavailable');
+          audioContext = new AC();
+          await audioContext.resume();
+          chordStep = 0; playChord();
+          musicTimer = setInterval(playChord, 3600);
+        }
+        playingMusic = true;
+      } catch (error) {
+        console.warn('Music could not start:', error);
+        playingMusic = false;
+      }
+    } else {
+      playingMusic = false;
+      clearInterval(musicTimer); musicTimer = null;
+      if (trackAudio) {trackAudio.pause();trackAudio.currentTime=0;trackAudio=null;}
+      if (audioContext) {audioContext.close().catch(()=>{});audioContext=null;}
     }
+    musicToggle.setAttribute('aria-pressed', String(playingMusic));
+    musicToggle.setAttribute('aria-label', playingMusic ? 'Pause background music' : 'Play background music');
+    musicLabel.textContent = playingMusic ? 'Music on' : 'Music off';
+  }
+  musicToggle.addEventListener('click', () => setMusic(!playingMusic));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && playingMusic) setMusic(false);
   });
-  document.addEventListener('keydown',event=>{
-    if(!isOpen || turning || event.altKey || event.ctrlKey || event.metaKey) return;
-    if(event.key==='ArrowRight' && !event.target.closest('[data-letter-sheet]')) {event.preventDefault();turnPage(1);}
-    if(event.key==='ArrowLeft' && !event.target.closest('[data-letter-sheet]')) {event.preventDefault();turnPage(-1);}
-  });
-
-  cover.addEventListener('click',openBook);
-  smallScreen.addEventListener('change',()=>{
-    clearTimeout(resizeTimer);
-    resizeTimer=setTimeout(()=>{
-      if(turning) return;
-      const previouslyMobile=isMobile;
-      isMobile=smallScreen.matches;
-      if(previouslyMobile===isMobile) return;
-      if(!isMobile) current=Math.floor(current/2)*2;
-      renderStationary(current);renderControls();
-    },120);
-  });
-  setInterval(tickClocks,30000);
-  renderStationary(0);
-  renderControls();
-  tickClocks();
 })();
