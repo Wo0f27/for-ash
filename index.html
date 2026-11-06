@@ -2,236 +2,179 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f0e6">
-  <meta name="description" content="A tiny illustrated birthday story, made for a friend across the miles.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4eee3">
+  <meta name="description" content="A little birthday storybook made for a friend across the miles.">
   <meta name="robots" content="noindex,nofollow">
-  <title>The Pages Between Us · A Birthday Story</title>
+  <title>The Pages Between Us · For Ash</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=6">
-  <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}</style></noscript>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=7">
   <script src="config.js" defer></script>
-  <script src="script.js?v=6" defer></script>
+  <script src="script.js?v=7" defer></script>
 </head>
 <body>
-  <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
-  <a class="skip-link" href="#chapter-one">Skip to the story</a>
-  <div class="ambient ambient-one" aria-hidden="true"></div>
-  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <main class="storybook-app" id="app">
+    <header class="masthead">
+      <div class="masthead-name"><span aria-hidden="true">✦</span><span>the pages between us</span></div>
+      <div class="masthead-date">FOR <span data-recipient>Ash</span> · 07 NOV</div>
+    </header>
 
-  <div class="page-turn-overlay" id="page-turn-overlay" aria-hidden="true">
-    <div class="page-turn-paper"><span class="page-turn-ornament">✧</span><span id="transition-label">the next page</span></div>
-  </div>
+    <div class="book-area">
+      <div class="book-backdrop backdrop-a" aria-hidden="true">✳</div>
+      <div class="book-backdrop backdrop-b" aria-hidden="true">❀</div>
+      <div class="book-shell is-closed" id="book" aria-label="Interactive birthday storybook">
+        <div class="book-edge" aria-hidden="true"></div>
+        <div class="paper-surface" aria-hidden="true"></div>
 
-  <header class="site-header">
-    <a class="site-mark" href="#home" aria-label="Back to the beginning">
-      <span class="mark-icon" aria-hidden="true">✦</span><span>the pages between us</span>
-    </a>
-    <nav class="desktop-nav" aria-label="Chapters">
-      <a href="#chapter-one">The beginning</a>
-      <a href="#chapter-two">Little chaos</a>
-      <a href="#chapter-three">The miles</a>
-      <a href="#chapter-four">Your letter</a>
-      <a href="#chapter-five">A wish</a>
-    </nav>
-    <details class="chapter-menu">
-      <summary>Chapters <span aria-hidden="true">⌄</span></summary>
-      <nav aria-label="Jump to a chapter">
-        <a href="#chapter-one">01 · Wattpad</a>
-        <a href="#chapter-two">02 · Little chaos</a>
-        <a href="#chapter-three">03 · Across the miles</a>
-        <a href="#chapter-four">04 · Your letter</a>
-        <a href="#chapter-five">05 · Birthday wish</a>
-      </nav>
-    </details>
-    <a class="header-end" href="#chapter-five">07 · 11 <span aria-hidden="true">✳</span></a>
-  </header>
+        <div class="book-page book-left" id="page-left" aria-hidden="true"></div>
+        <div class="book-page book-right" id="page-right" aria-hidden="true"></div>
+        <div class="book-gutter" aria-hidden="true"></div>
+        <div class="turn-leaf" id="turn-leaf" aria-hidden="true">
+          <div class="turn-leaf-face leaf-front" id="leaf-front"></div>
+          <div class="turn-leaf-face leaf-back" id="leaf-back"></div>
+        </div>
 
-  <main>
-    <section class="hero" id="home" aria-labelledby="hero-title">
-      <div class="hero-dust dust-a" aria-hidden="true">✧</div>
-      <div class="hero-dust dust-b" aria-hidden="true">✳</div>
-      <div class="hero-dust dust-c" aria-hidden="true">✦</div>
-      <div class="hero-left" data-reveal>
-        <p class="eyebrow"><span class="eyebrow-line"></span> an illustrated little birthday surprise</p>
-        <h1 id="hero-title">Some stories<br>are better <em>shared.</em></h1>
-        <p class="hero-description">This one began with words on a screen, found its way across the miles, and somehow kept going.</p>
-        <p class="hero-for">A little something for <strong data-recipient>Ash</strong> <span aria-hidden="true">♡</span></p>
-        <a class="button button-primary" href="#chapter-one" id="begin-story">Open the story <span aria-hidden="true">↗</span></a>
-        <p class="hero-tiny">For the best experience: find a cozy spot, then take your time.</p>
-      </div>
-      <div class="hero-art" data-reveal>
-        <div class="art-back-shadow"></div>
-        <div class="flower flower-top" aria-hidden="true"><span>✿</span></div>
-        <div class="flower flower-bottom" aria-hidden="true"><span>✳</span></div>
-        <button class="book-illustration" id="storybook-cover" type="button" aria-label="Open the storybook cover to begin">
-          <div class="book-spine"></div>
-          <div class="book-border">
-            <span class="book-ornament book-ornament-top" aria-hidden="true">✧ · ❀ · ✧</span>
-            <div class="book-center">
-              <span class="book-small">A BIRTHDAY STORY</span>
-              <span class="book-line"></span>
-              <span class="book-title">the pages<br><i>between</i><br>us</span>
-              <span class="book-line"></span>
-              <span class="book-small book-bottom">FOR <span data-recipient>ASH</span> · NOV 07</span>
-            </div>
-            <span class="book-ornament book-ornament-bottom" aria-hidden="true">❦</span>
-          </div>
-          <span class="book-cover-inside" aria-hidden="true">a story worth keeping ♡</span>
-        </button>
-        <div class="book-reveal" aria-hidden="true">
-          <span class="reveal-edition">CHAPTER ONE</span>
-          <span class="reveal-ornament">✧ ❀ ✧</span>
-          <span class="reveal-title">Once upon<br><i>a Wattpad...</i></span>
-          <span class="reveal-subtitle">The beginning of a rather unexpected friendship.</span>
-          <span class="reveal-footer">turn the page ♡</span>
-        </div>
-        <div class="book-under-page"></div>
-        <div class="art-caption">volume 01 <span>·</span> a friendship in chapters</div>
-      </div>
-      <div class="hero-scroll" aria-hidden="true"><span class="scroll-line"></span> every chapter has another page</div>
-    </section>
-
-    <section class="story-section section-origin" id="chapter-one" aria-labelledby="origin-title">
-      <div class="section-wrap chapter-grid">
-        <div class="chapter-copy" data-reveal>
-          <p class="chapter-tag">Chapter one <span>·</span> the beginning</p>
-          <h2 id="origin-title">It started with<br><em>a story.</em></h2>
-          <p>Once upon a Wattpad, two people happened to cross paths somewhere between stories, messages, and the internet being the internet.</p>
-          <p>Funny how a place for fictional worlds can lead to a very real friendship.</p>
-          <p class="chapter-aside">Plot twist: the conversations continued.</p>
-        </div>
-        <div class="origin-visual" data-reveal aria-hidden="true">
-          <div class="letter-paper paper-back"><span>W</span><span>✳</span></div>
-          <div class="letter-paper paper-main">
-            <p class="paper-kicker">an unexpected beginning</p>
-            <p class="paper-heading">Dear Internet,</p>
-            <div class="paper-ruled-lines"><span></span><span></span><span></span><span></span><span></span></div><p class="paper-typing" id="paper-typing" aria-label="Two writers, one unexpected friendship."></p>
-            <p class="paper-footnote">and the story goes on. ♡</p>
-          </div>
-          <span class="origin-doodle origin-doodle-one">✦</span>
-          <span class="origin-doodle origin-doodle-two">✧</span>
-          <span class="origin-label">est. somewhere in the Wattpad era</span>
-        </div>
-      </div>
-            <a class="chapter-next" href="#chapter-two"><span class="chapter-next-rule" aria-hidden="true"></span>Turn to the next page <strong>The little chaos</strong><span aria-hidden="true">↗</span></a>
-    </section>
-
-    <section class="story-section section-chaos" id="chapter-two" aria-labelledby="chaos-title">
-      <div class="section-wrap">
-        <div class="section-heading centered" data-reveal>
-          <p class="chapter-tag">Chapter two <span>·</span> familiar chaos</p>
-          <h2 id="chaos-title">The little things<br><em>we'd recognize.</em></h2>
-          <p>A tiny archive of recurring nonsense. Tap a note to peek inside.</p>
-        </div>
-        <div class="note-grid" id="note-grid" aria-label="Interactive memory notes"></div>
-        <p class="chaos-footnote">Some context is strictly between us. And some context probably never existed.</p>
-      </div>
-            <a class="chapter-next" href="#chapter-three"><span class="chapter-next-rule" aria-hidden="true"></span>Turn to the next page <strong>Across the miles</strong><span aria-hidden="true">↗</span></a>
-    </section>
-
-    <section class="story-section section-distance" id="chapter-three" aria-labelledby="distance-title">
-      <div class="section-wrap distance-layout">
-        <div class="distance-illustration" data-reveal>
-          <div class="distance-sky" aria-hidden="true">
-            <div class="sun"></div><div class="moon"></div>
-            <div class="sky-star star-1">✦</div><div class="sky-star star-2">✧</div><div class="sky-star star-3">✦</div><div class="sky-star star-4">·</div>
-            <div class="horizon-line"></div>
-            <div class="sky-caption">same sky, different hours</div>
-          </div>
-          <div class="clocks">
-            <div class="clock-card"><span class="clock-place">The Philippines</span><strong id="clock-ph">--:--</strong><span class="clock-city">Philippines</span></div>
-            <span class="clocks-divider" aria-hidden="true">↔</span>
-            <div class="clock-card"><span class="clock-place">Across the miles</span><strong id="clock-it">--:--</strong><span class="clock-city" id="friend-city">Italy</span></div>
-          </div>
-          <p class="clock-note">* The Italy location is a placeholder you can change in config.js.</p>
-        </div>
-        <div class="chapter-copy" data-reveal>
-          <p class="chapter-tag">Chapter three <span>·</span> across the miles</p>
-          <h2 id="distance-title">Different clocks.<br><em>Same conversation.</em></h2>
-          <p>There are classes, workdays, busy weeks, and the occasional message answered at an unreasonable hour.</p>
-          <p>This little page is a nod to the chats that somehow find their way between it all.</p>
-          <p class="chapter-aside">Time zones really chose violence.</p>
-        </div>
-      </div>
-            <a class="chapter-next" href="#chapter-four"><span class="chapter-next-rule" aria-hidden="true"></span>Turn to the next page <strong>A letter for you</strong><span aria-hidden="true">↗</span></a>
-    </section>
-
-    <section class="story-section section-letter" id="chapter-four" aria-labelledby="letter-title">
-      <div class="section-wrap letter-layout">
-        <div class="section-heading centered" data-reveal>
-          <p class="chapter-tag">Chapter four <span>·</span> a few words</p>
-          <h2 id="letter-title">There's something<br><em>I'd like you to read.</em></h2>
-          <p>Some things deserve more than a passing notification.</p>
-        </div>
-        <div class="envelope-stage" id="envelope-stage" data-reveal>
-          <button class="envelope-button" id="open-letter" type="button" aria-expanded="false" aria-label="Remove the birthday letter from the envelope" aria-controls="letter-extraction">
-            <span class="envelope" aria-hidden="true">
-              <span class="envelope-back"></span>
-              <span class="envelope-flap"></span>
-              <span class="envelope-front"></span>
-              <span class="envelope-seal">♡</span>
+        <button class="book-cover" id="book-cover" type="button" aria-label="Open the birthday storybook">
+          <span class="cover-face cover-outside">
+            <span class="cover-inner-border">
+              <span class="cover-flourish cover-top" aria-hidden="true">✧ · ❀ · ✧</span>
+              <span class="cover-middle">
+                <span class="cover-kicker">A BIRTHDAY STORY</span>
+                <span class="cover-small-line" aria-hidden="true"></span>
+                <span class="cover-title">the pages<br><i>between</i><br>us</span>
+                <span class="cover-small-line" aria-hidden="true"></span>
+                <span class="cover-for">FOR <span data-recipient>Ash</span> · NOVEMBER SEVENTH</span>
+              </span>
+              <span class="cover-flourish cover-bottom" aria-hidden="true">❦</span>
             </span>
-            <span class="envelope-label" id="envelope-label">Tap to break the seal</span>
-          </button>
-          <div class="letter-extraction" id="letter-extraction" hidden>
-            <article class="actual-letter" id="letter-content" aria-labelledby="letter-heading" aria-description="Tap or press Enter to return the letter to its envelope." tabindex="0">
-              <div class="letter-inner">
-                <p class="letter-date">November 7, <span data-year>2026</span></p>
-                <h3 id="letter-heading">Dear <span data-recipient>Ash</span>,</h3>
-                <div id="letter-paragraphs" class="letter-paragraphs"></div>
-                <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
-              </div>
-              <p class="letter-tap-hint" aria-hidden="true">Tap the paper to fold it away <span>↶</span></p>
-            </article>
-          </div>
-          <p class="envelope-caption">A little letter to unfold, whenever you're ready.</p>
-        </div>
+            <span class="cover-click-hint">tap this cover to open <span aria-hidden="true">✧</span></span>
+          </span>
+          <span class="cover-face cover-inside" aria-hidden="true"><span>for the stories<br>still to come ♡</span></span>
+        </button>
       </div>
-            <a class="chapter-next" href="#chapter-five"><span class="chapter-next-rule" aria-hidden="true"></span>Turn to the next page <strong>The birthday wish</strong><span aria-hidden="true">↗</span></a>
-    </section>
+    </div>
 
-    <section class="story-section section-birthday" id="chapter-five" aria-labelledby="birthday-title">
-      <div class="section-wrap birthday-layout">
-        <div class="section-heading centered" data-reveal>
-          <p class="chapter-tag">The epilogue <span>·</span> November seventh</p>
-          <h2 id="birthday-title">And now, the most<br><em>important chapter.</em></h2>
-          <p class="birthday-intro">Happy birthday, <strong data-recipient>Ash</strong>! There's a tiny cake down here, naturally.</p>
-        </div>
-        <div class="birthday-interaction" data-reveal>
-          <div class="cake-scene" id="cake-scene" role="img" aria-label="Illustrated three-candle birthday cake">
-            <div class="cake-stars" aria-hidden="true">✧ <span>✦</span> ✧</div>
-            <div class="cake-candles" aria-hidden="true">
-              <div class="candle"><span class="flame"></span><span class="candle-smoke"></span></div>
-              <div class="candle"><span class="flame"></span><span class="candle-smoke"></span></div>
-              <div class="candle"><span class="flame"></span><span class="candle-smoke"></span></div>
-            </div>
-            <div class="cake-top"><span class="cake-dot dot-a"></span><span class="cake-dot dot-b"></span><span class="cake-dot dot-c"></span><span class="cake-dot dot-d"></span></div>
-            <div class="cake-base"><span class="cake-message">make a wish ♡</span></div>
-            <div class="cake-plate"></div>
-            <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
-          </div>
-          <button class="button button-primary" id="blow-candles">Make a wish &amp; blow out the candles <span aria-hidden="true">✳</span></button>
-          <p id="birthday-wish" class="birthday-wish" aria-live="polite" hidden></p>
-        </div>
-        <div class="extra-surprise" data-reveal>
-          <p>Hold on. There's one more gift.</p>
-          <a class="mystery-gift" id="rickroll-link" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" aria-label="Open the traditional surprise in a new tab">
-            <span class="mystery-ribbon" aria-hidden="true">✦</span>
-            <span>Definitely a normal, trustworthy birthday surprise</span>
-            <span aria-hidden="true">↗</span>
-          </a>
-          <small>Some traditions simply cannot be abandoned.</small>
-        </div>
+    <nav class="book-controls" aria-label="Book navigation">
+      <button type="button" class="nav-arrow" id="previous-page" disabled aria-label="Previous page"><span aria-hidden="true">←</span><span class="nav-text">Previous</span></button>
+      <div class="book-progress">
+        <div class="progress-label" id="progress-label" aria-live="polite">A story for you</div>
+        <div class="progress-dots" id="progress-dots" aria-hidden="true"></div>
       </div>
-    </section>
-
-    <footer class="site-footer">
-      <span class="footer-symbol" aria-hidden="true">❦</span>
-      <p>For the conversations still waiting to happen.</p>
-      <span class="footer-end">to be continued <span aria-hidden="true">↗</span></span>
-      <a href="#home" class="back-top">Back to the first page ↑</a>
-    </footer>
+      <button type="button" class="nav-arrow nav-next" id="next-page" disabled aria-label="Next page"><span class="nav-text">Next page</span><span aria-hidden="true">→</span></button>
+    </nav>
+    <p class="book-instructions" id="book-instructions">Start by tapping the book. Then use the page arrows or swipe to read.</p>
   </main>
+
+  <template id="page-intro">
+    <div class="page-content page-intro">
+      <div class="folio-label">A LETTER IN THE FORM OF A BOOK</div>
+      <div class="intro-illustration" aria-hidden="true"><span>✿</span><span>❦</span><span>✧</span></div>
+      <div class="intro-text">
+        <p class="page-eyebrow">a little birthday surprise</p>
+        <h1>Some stories<br>are better <em>shared.</em></h1>
+        <p>This one began with words on a screen, found its way across the miles, and somehow kept going.</p>
+        <p class="intro-dedication">A little something for <strong data-recipient>Ash</strong> ♡</p>
+      </div>
+      <div class="intro-bottom">TAKE YOUR TIME · EVERY PAGE HAS SOMETHING TO SAY</div>
+    </div>
+  </template>
+
+  <template id="page-origin">
+    <div class="page-content page-origin">
+      <div class="folio-label">CHAPTER ONE · THE BEGINNING</div>
+      <h2>It started with<br><em>a story.</em></h2>
+      <div class="wattpad-note" aria-hidden="true">
+        <span class="wattpad-mark">W</span>
+        <span class="wattpad-lines"><i></i><i></i><i></i></span>
+        <span class="wattpad-note-caption">a rather unexpected beginning ✧</span>
+      </div>
+      <p>Once upon a Wattpad, two people happened to cross paths somewhere between stories, messages, and the internet being the internet.</p>
+      <p>Funny how a place for fictional worlds can lead to a very real friendship.</p>
+      <p class="page-aside">Plot twist: the conversations continued.</p>
+    </div>
+  </template>
+
+  <template id="page-notes">
+    <div class="page-content page-notes">
+      <div class="folio-label">CHAPTER TWO · FAMILIAR CHAOS</div>
+      <h2>Little things<br><em>we'd recognize.</em></h2>
+      <p class="page-lead">A tiny archive of recurring nonsense. Tap a note to reveal what is inside.</p>
+      <div class="memory-grid" data-memory-grid aria-label="Four interactive inside jokes"></div>
+      <p class="page-aside">Some context is strictly between us. And some context probably never existed.</p>
+    </div>
+  </template>
+
+  <template id="page-distance">
+    <div class="page-content page-distance">
+      <div class="folio-label">CHAPTER THREE · ACROSS THE MILES</div>
+      <h2>Different clocks.<br><em>Same conversation.</em></h2>
+      <div class="sky-postcard" aria-hidden="true"><span class="sky-sun"></span><span class="sky-moon"></span><span class="sky-spark a">✦</span><span class="sky-spark b">✧</span><span class="sky-spark c">✦</span><span class="sky-text">same sky, different hours</span></div>
+      <div class="time-cards">
+        <div class="time-card"><small>PHILIPPINES</small><strong data-clock="ph">--:--</strong></div>
+        <span class="time-connection" aria-hidden="true">↔</span>
+        <div class="time-card"><small data-friend-location>ITALY</small><strong data-clock="it">--:--</strong></div>
+      </div>
+      <p>There are classes, workdays, busy weeks, and the occasional message answered at an unreasonable hour.</p>
+      <p class="page-aside">Time zones really chose violence.</p>
+    </div>
+  </template>
+
+  <template id="page-letter">
+    <div class="page-content page-letter">
+      <div class="folio-label">CHAPTER FOUR · A FEW WORDS</div>
+      <h2>Something<br><em>for you to read.</em></h2>
+      <p class="page-lead">Some things deserve more than a passing notification.</p>
+      <div class="letter-world" data-letter-world>
+        <div class="letter-envelope" data-letter-envelope aria-hidden="true">
+          <div class="env-back"></div>
+          <div class="env-flap"></div>
+          <div class="env-front"></div>
+          <div class="env-stamp">♡</div>
+        </div>
+        <div class="letter-sheet" data-letter-sheet role="button" tabindex="-1" aria-label="Tap letter to fold it into the envelope" aria-hidden="true">
+          <div class="sheet-inner">
+            <small>November 7, <span data-year>2026</span></small>
+            <h3>Dear <span data-recipient>Ash</span>,</h3>
+            <div data-letter-paragraphs class="letter-prose"></div>
+            <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
+          </div>
+        </div>
+        <button class="letter-tap-zone" data-letter-toggle type="button" aria-label="Open the birthday letter"><span aria-hidden="true">♡</span><span data-letter-label>Tap the envelope to open</span></button>
+      </div>
+      <p class="page-aside letter-aside">Once it's open, tap the paper again to put it back.</p>
+    </div>
+  </template>
+
+  <template id="page-birthday">
+    <div class="page-content page-birthday">
+      <div class="folio-label">THE EPILOGUE · NOVEMBER SEVENTH</div>
+      <h2>The most<br><em>important chapter.</em></h2>
+      <p class="page-lead">Happy birthday, <strong data-recipient>Ash</strong>! There's a tiny cake, naturally.</p>
+      <div class="cake-scene" data-cake-scene role="img" aria-label="Birthday cake with three flickering candles">
+        <div class="cake-shimmer" aria-hidden="true">✧ <span>✦</span> ✧</div>
+        <div class="cake-candles" aria-hidden="true"><span class="candle"><i class="flame"></i><i class="smoke"></i></span><span class="candle"><i class="flame"></i><i class="smoke"></i></span><span class="candle"><i class="flame"></i><i class="smoke"></i></span></div>
+        <div class="cake-icing"></div><div class="cake-base"><span>make a wish ♡</span></div><div class="cake-plate"></div>
+        <div class="cake-confetti" data-confetti aria-hidden="true"></div>
+      </div>
+      <button class="wish-button" type="button" data-wish-button>Make a wish &amp; blow out the candles ✳</button>
+      <p class="birthday-wish" data-birthday-wish aria-live="polite" hidden></p>
+      <div class="mystery-note"><span>One more entirely trustworthy gift</span><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">open the mystery ↗</a><small>Some traditions can't be abandoned.</small></div>
+    </div>
+  </template>
+
+  <template id="page-ending">
+    <div class="page-content page-ending">
+      <span class="ending-ornament" aria-hidden="true">✧ ❀ ✧</span>
+      <div class="ending-core"><p class="page-eyebrow">a small final note</p><h2>To be<br><em>continued.</em></h2><p>For the conversations still waiting to happen.</p><p class="ending-signature">with appreciation, <span data-sender>Your friend</span> ♡</p></div>
+      <div class="ending-action"><button type="button" data-restart>Read from the beginning ↺</button></div>
+    </div>
+  </template>
+
+  <template id="page-blank">
+    <div class="page-content page-blank"><span class="blank-ornament">❦</span><span>fin.</span></div>
+  </template>
 </body>
 </html>
