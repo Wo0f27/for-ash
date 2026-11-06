@@ -1,6 +1,14 @@
-# The Pages Between Us — birthday site (v1)
+# The Pages Between Us — birthday site (v2)
 
 A mobile-friendly, self-contained birthday storybook. There are **no frameworks, build steps, trackers, or paid dependencies**.
+
+## Animated storybook interactions (v2)
+
+- Tap the book cover or **Open the story**: the cover turns on its hinge and reveals chapter one.
+- Use the **Turn to the next page** links or chapter navigation to trigger a paper-turn transition.
+- Watch the typewriter note appear in the Wattpad-era chapter.
+- Flip the memory cards, open the envelope and watch its letter peek out, and blow out the candles for smoke and confetti.
+- Reduced-motion settings are respected. The site remains a scrollable story rather than a rigid slideshow.
 
 ## Edit your own words
 
@@ -23,7 +31,7 @@ Double-click **index.html** to preview in a browser. Everything works without a 
 ## Publish to GitHub Pages
 
 1. This repository has already been created. Repository: `Wo0f27/for-ash`.
-2. Upload `index.html`, `styles.css`, `script.js`, `config.js`, `favicon.svg`, `README.md`, and optionally `.nojekyll` **directly in the repository root**, not inside a subfolder. Commit the changes to `main`.
+2. Website files are already committed in the repository root. Further changes made here can be published automatically.
 3. In that repository, open **Settings → Pages**.
 4. Under **Build and deployment**, set **Source** to `Deploy from a branch`.
 5. Select `main` and `/ (root)`, then Save.
@@ -40,4 +48,4 @@ Official guide: https://docs.github.com/en/pages/getting-started-with-github-pag
 - Do not add personal photographs without permission.
 - No auto-playing audio is included; we can add an opt-in music toggle if you provide a permitted audio track.
 - The two clocks use built-in browser `Intl` time-zone support and automatically account for daylight saving time.
-- This is **version 1**, so all design/content may still be customized before publishing.
+- This is **version 2**, so all design/content may still be customized before publishing.

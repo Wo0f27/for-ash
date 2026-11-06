@@ -149,4 +149,96 @@
       setTimeout(() => layer.replaceChildren(), 2500);
     }
   });
+
+
+  // V2: opening the actual cover now turns it on its hinge before revealing chapter one.
+  const cover = $('#storybook-cover');
+  const heroArt = $('.hero-art');
+  const turnOverlay = $('#page-turn-overlay');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let turning = false;
+  let opening = false;
+  function navigateTo(target, animate = true) {
+    const destination = document.querySelector(target);
+    if (!destination || turning) return;
+    if (!animate || reduceMotion.matches) {
+      destination.scrollIntoView({ behavior: 'instant', block: 'start' });
+      history.pushState(null, '', target);
+      return;
+    }
+    turning = true;
+    turnOverlay.classList.remove('is-turning');
+    void turnOverlay.offsetWidth; // Re-start CSS keyframes after consecutive turns.
+    turnOverlay.classList.add('is-turning');
+    setTimeout(() => {
+      destination.scrollIntoView({ behavior: 'instant', block: 'start' });
+      history.pushState(null, '', target);
+    }, 460);
+    setTimeout(() => {
+      turnOverlay.classList.remove('is-turning');
+      turning = false;
+    }, 950);
+  }
+  function openTheBook(event) {
+    if (event) event.preventDefault();
+    if (opening) return;
+    if (reduceMotion.matches) {
+      navigateTo('#chapter-one', false);
+      return;
+    }
+    opening = true;
+    heroArt.classList.add('is-opening');
+    cover.disabled = true;
+    setTimeout(() => navigateTo('#chapter-one', true), 1330);
+    setTimeout(() => {
+      heroArt.classList.remove('is-opening');
+      cover.disabled = false;
+      opening = false;
+    }, 2700);
+  }
+  cover.addEventListener('click', openTheBook);
+  $('#begin-story').addEventListener('click', openTheBook);
+  document.querySelectorAll('a[href^="#"]:not(.skip-link):not(#begin-story)').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const hash = link.getAttribute('href');
+      if (!hash || !document.querySelector(hash)) return;
+      event.preventDefault();
+      navigateTo(hash, true);
+    });
+  });
+
+  // Typewriter note begins when its chapter enters the viewport, not before.
+  const typedNote = $('#paper-typing');
+  const noteText = 'Two writers. One unexpected friendship.';
+  let typingStarted = false;
+  function typeChapterNote() {
+    if (typingStarted) return;
+    typingStarted = true;
+    if (reduceMotion.matches) {
+      typedNote.textContent = noteText;
+      return;
+    }
+    typedNote.classList.add('is-typing');
+    let i = 0;
+    const typer = setInterval(() => {
+      i++;
+      typedNote.textContent = noteText.slice(0, i);
+      if (i >= noteText.length) {
+        clearInterval(typer);
+        typedNote.classList.remove('is-typing');
+      }
+    }, 49);
+  }
+  if ('IntersectionObserver' in window) {
+    const typingObserver = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        typeChapterNote();
+        typingObserver.disconnect();
+      }
+    }, { threshold: 0.15 });
+    typingObserver.observe($('#chapter-one'));
+  } else {
+    typeChapterNote();
+  }
+
 })();
