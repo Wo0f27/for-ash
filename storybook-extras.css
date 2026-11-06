@@ -1,0 +1,133 @@
+/* The Pages Between Us — in-book details (MIT adaptation credits in THIRD_PARTY_NOTICES.md).
+   Only scoped, book-local selectors; no separate app, modal or global reset. */
+
+/* The text is laid out at its final width from the first frame. Concealing glyphs
+   with visibility rather than removing text prevents reflow while they appear. */
+.tw-target .tw-char { visibility: hidden; }
+.tw-target .tw-char.is-written { visibility: visible; }
+.tw-target { cursor: text; }
+.tw-skip {
+  position: absolute; right: 13px; bottom: 12px; z-index: 24;
+  min-height: 34px; padding: 6px 11px; border-radius: 20px;
+  border: 1px solid #cbb89c; background: #fffaf0f2; color: #557064;
+  font: 600 10px var(--sans); cursor: pointer;
+  box-shadow: 0 3px 12px #65583f19;
+}
+.tw-skip:focus-visible, .scratch-card button:focus-visible, .mini-envelope-toggle:focus-visible,
+.bloom-replay:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+
+/* Canvas-coated scratch notes: pointer input stays inside the paper instead of
+   being interpreted as StPageFlip navigation. Adapted from the destination-out
+   scratch concept in TH3-S4URAV/pookie-birthday-surprise. */
+.page-scratch .page-lead { margin-bottom: 13px; }
+.scratch-grid { display: grid; grid-template-columns: 1fr; gap: 11px; max-width: 415px; margin: 0 auto; }
+.scratch-card { min-height: 118px; position: relative; overflow: hidden; border-radius: 12px;
+  border: 1px solid #e7d8bc; background: #fff8ea; box-shadow: 2px 5px 13px #6c695220;
+  touch-action: none; isolation: isolate; }
+.scratch-reward { min-height: 118px; width: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 13px 15px 19px;
+  background: radial-gradient(circle at 18% 20%,#f4dfcce8,transparent 45%),#fff7e7;
+  color: #547160; text-align: center; }
+.scratch-reward h3 { font: 500 16px/1.35 var(--serif); margin: 0 0 6px; }
+.scratch-reward p { font: italic 12px/1.55 var(--serif); margin: 0; overflow-wrap: anywhere; }
+.scratch-coat { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  cursor: crosshair; touch-action: none; transition: opacity .65s ease, transform .65s ease;
+  user-select: none; -webkit-user-select: none; }
+.scratch-card.is-revealed .scratch-coat { opacity: 0; transform: scale(1.04); pointer-events: none; }
+.scratch-skip { position: absolute; bottom: 4px; right: 7px; z-index: 2; border: 0;
+  background: #fff8e8e6; padding: 3px 6px; border-radius: 12px; color: #816c7e;
+  font: 600 9px var(--sans); cursor: pointer; }
+.scratch-card.is-revealed .scratch-skip { display: none; }
+.scratch-card:focus-within { outline-offset: 3px; }
+
+/* Miniature envelopes share the paper, seal and folding language of the main
+   envelope, but their letters unfold IN THE BOOK rather than in a modal. */
+.openwhen-list { display: flex; flex-direction: column; gap: 9px; max-width: 405px; margin: 0 auto; }
+.mini-envelope { position: relative; z-index: 0; background: #fffaf0; border: 1px solid #e1d4b9;
+  border-radius: 10px; box-shadow: 1px 4px 12px #515c4930; overflow: hidden; }
+.mini-envelope.is-open { z-index: 2; border-color: #b9bca7; }
+.mini-envelope-toggle { width: 100%; min-height: 67px; display: flex; align-items: center; gap: 12px;
+  background: transparent; border: 0; text-align: left; cursor: pointer;
+  padding: 10px 12px; color: #496653; }
+.mini-icon { display: block; position: relative; width: 59px; height: 41px; flex: 0 0 59px;
+  background: #dfc4a8; border-radius: 3px 3px 6px 6px; box-shadow: 1px 2px 5px #6c624b3b; perspective: 450px; }
+.mini-icon::before { content: ''; position: absolute; inset: 0; background: #e9d1b6;
+  clip-path: polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%); z-index: 1; }
+.mini-icon::after { content: '♡'; position: absolute; z-index: 3; top: 17px; left: 23px;
+  color: #a76d73; font-size: 12px; }
+.mini-flap { position: absolute; inset: 0 0 auto; height: 27px; background: #cba88a;
+  clip-path: polygon(0 0,100% 0,50% 100%); transform-origin: top center;
+  z-index: 2; transition: transform .55s cubic-bezier(.2,.8,.2,1); }
+.mini-envelope.is-open .mini-flap { transform: rotateX(176deg); z-index: 0; }
+.mini-label { flex: 1; min-width: 0; font: 500 13px/1.4 var(--serif); color: #486353; }
+.mini-chevron { color: #b0916e; transition: transform .4s ease; }
+.mini-envelope.is-open .mini-chevron { transform: rotate(180deg); }
+.mini-paper-holder { display: grid; grid-template-rows: 0fr; opacity: 0;
+  transition: grid-template-rows .68s cubic-bezier(.2,.72,.25,1), opacity .35s ease; }
+.mini-envelope.is-open .mini-paper-holder { grid-template-rows: 1fr; opacity: 1; }
+.mini-paper-clip { min-height: 0; overflow: hidden; }
+.mini-paper { position: relative; margin: 0 11px 12px; padding: 13px 15px; max-height: 205px;
+  border: 1px solid #ebdfcb; background: linear-gradient(#fffdf6,#fcf5e8);
+  transform: translateY(-22px) scale(.96); transform-origin: center top;
+  transition: transform .68s cubic-bezier(.2,.72,.25,1); }
+.mini-envelope.is-open .mini-paper { transform: translateY(0) scale(1); }
+.mini-paper p { margin: 0; font: 13px/1.75 var(--serif); color: #4d6659;
+  max-height: 175px; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; white-space: pre-line; overflow-wrap: anywhere; }
+.mini-paper small { display: block; margin-top: 7px; text-align: right; color: #a78e72; font: italic 10px var(--serif); }
+
+/* Three flowers on a contained, book-sized stage. The stem growth, delayed
+   petal opening and wandering light concept is adapted from FIQTOR. */
+.page-bloom { text-align: center; }
+.page-bloom h2 { margin-bottom: 11px; }
+.page-bloom .page-lead { margin: 0 auto 13px; }
+.garden-frame { width: min(100%,405px); margin: 0 auto; position: relative; aspect-ratio: 420 / 300;
+  border-radius: 15px; overflow: hidden; box-shadow: 0 14px 27px #4c645041;
+  background: #426359; isolation: isolate; }
+.bloom-art { width: 100%; height: 100%; display: block; }
+.garden-light { opacity: 0; }
+.garden-flower .garden-stem { stroke-dasharray: 520; stroke-dashoffset: 520; }
+.garden-flower .garden-leaf, .garden-flower .garden-petals { opacity: 0; transform-box: fill-box; transform-origin: center bottom; }
+.garden-grass { stroke-dasharray: 120; stroke-dashoffset: 120; }
+.garden-frame.is-blooming .garden-stem {
+  animation: gardenStem 1.8s calc(.10s + var(--bloom-delay)) ease-out forwards; }
+.garden-frame.is-blooming .garden-leaf {
+  animation: gardenLeaf 1s calc(1.15s + var(--bloom-delay)) cubic-bezier(.2,.8,.25,1) forwards; }
+.garden-frame.is-blooming .garden-leaf-b { animation-delay: calc(1.48s + var(--bloom-delay)); }
+.garden-frame.is-blooming .garden-petals {
+  animation: gardenPetals 1.15s calc(1.8s + var(--bloom-delay)) cubic-bezier(.18,.85,.19,1.06) forwards; }
+.garden-frame.is-blooming .garden-petal { transform-origin: 0 0; }
+.garden-frame.is-blooming .garden-grass { animation: gardenStem 2.2s .85s ease-out forwards; }
+.garden-frame.is-blooming .garden-light { animation: gardenFirefly 3.6s 2.2s ease-in-out infinite alternate; }
+.garden-frame.is-blooming .garden-light:nth-of-type(odd) { animation-delay: 2.8s; }
+@keyframes gardenStem { to { stroke-dashoffset: 0; } }
+@keyframes gardenLeaf { from { opacity: 0; transform: scale(.04) rotate(-12deg); } to {opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes gardenPetals { from { opacity: 0; transform: scale(.03) rotate(-19deg); } 75% {opacity: 1;} to {opacity: 1;transform: scale(1) rotate(0);} }
+@keyframes gardenFirefly { from {opacity:.2;transform:translate(-2px,5px);filter:drop-shadow(0 0 1px #f9e5b1);} to {opacity:1;transform:translate(4px,-9px);filter:drop-shadow(0 0 5px #f9e5b1);} }
+.bloom-replay { margin: 17px auto 3px; border: 1px solid #b4bea8; background: #faf7ed;
+  color: #567361; border-radius: 25px; padding: 11px 18px; min-height: 43px;
+  font: 600 12px var(--sans); cursor: pointer; }
+.bloom-replay:hover { background: #f0eee3; }
+.page-bloom .page-aside { font-size: 13px; margin: 12px 0 !important; }
+
+@media (max-width: 850px) {
+  .scratch-card, .scratch-reward { min-height: 110px; }
+  .scratch-grid { gap: 9px; }
+  .mini-envelope-toggle { min-height: 61px; }
+  .mini-label { font-size: 12px; }
+  .garden-frame { max-width: 375px; }
+}
+@media (max-width: 370px) {
+  .scratch-card, .scratch-reward { min-height: 105px; }
+  .page-scratch h2, .page-openwhen h2, .page-bloom h2 { font-size: 30px; }
+  .garden-frame { max-width: 290px; }
+  .mini-paper { padding: 10px; }
+  .mini-paper p { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tw-target .tw-char { visibility: visible; }
+  .scratch-coat, .mini-flap, .mini-paper-holder, .mini-paper { transition-duration: .01ms !important; }
+  .garden-flower .garden-stem, .garden-grass { stroke-dashoffset: 0 !important; animation: none !important; }
+  .garden-flower .garden-leaf, .garden-flower .garden-petals { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .garden-light { opacity: .65 !important; animation: none !important; }
+}

@@ -10,9 +10,12 @@
     ['intro', 'A little dedication'],
     ['origin', 'Once upon a Wattpad'],
     ['notes', 'Familiar chaos'],
+    ['scratch', 'Hidden keepsakes'],
     ['distance', 'Across the miles'],
     ['letter', 'A letter for you'],
+    ['openwhen', 'Open when letters'],
     ['birthday', 'A birthday wish'],
+    ['bloom', 'A little garden'],
     ['ending', 'To be continued'],
     ['back-cover', 'The back cover']
   ];
@@ -97,6 +100,9 @@
     book.append(sheet);
   }
 
+  // All extras live inside the existing StPageFlip HTML sheets.
+  const extras = window.StorybookExtras?.init({ book, pageDefs, reducedMotion });
+
   function timeIn(zone) {
     try {
       return new Intl.DateTimeFormat('en-GB', {
@@ -142,6 +148,7 @@
         if (!letterOpen || letterFolding) return;
         letterExtracted = true; // The folded paper has cleared the pocket.
         syncLetter();           // It may now unfold in front without an overlap jump.
+        extras?.startIn($('[data-letter-world]',book));
       }, reducedMotion.matches ? 0 : 980);
     } else {
       letterFolding = true;
@@ -199,6 +206,9 @@
     });
     refreshClocks();
     syncCards(); syncLetter(); syncCake();
+    const orientation = pageFlip && typeof pageFlip.getOrientation === 'function'
+      ? pageFlip.getOrientation() : 'portrait';
+    extras?.showPage(index, orientation);
   }
 
   function flip(direction) {
@@ -223,13 +233,17 @@
   // The sheet is never handed to StPageFlip when the user interacts with its content.
   // Avoid interpreting a vertical letter scroll as an attempt to flip the book.
   const interactiveSelector = 'button, a, [role="button"], input, textarea, select, [data-letter-world], [data-memory-grid], [data-cake-scene], .mystery-note, .ending-action';
-  function interactive(target) { return !!target.closest(interactiveSelector); }
+  function interactive(target) {
+    return !!target.closest(interactiveSelector) || !!extras?.isInteractive(target);
+  }
   book.addEventListener('click', event => {
+    if (extras?.handleClick(event)) return;
     const card = event.target.closest('[data-card]');
     if (card) {
       const id = Number(card.dataset.card);
       if (revealedNotes.has(id)) revealedNotes.delete(id); else revealedNotes.add(id);
       syncCards();
+      if (revealedNotes.has(id)) extras?.startIn(card);
       return;
     }
     if (event.target.closest('[data-letter-toggle]')) {
@@ -244,7 +258,10 @@
     if (event.target.closest('[data-wish-button]')) {
       wishMade = !wishMade;
       syncCake();
-      if (wishMade) confetti(event.target.closest('.page-content'));
+      if (wishMade) {
+        confetti(event.target.closest('.page-content'));
+        extras?.startIn(event.target.closest('.page-content'));
+      }
       return;
     }
     if (event.target.closest('[data-restart]')) {
