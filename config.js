@@ -6,6 +6,8 @@ window.BIRTHDAY_CONFIG = {
   "friendLocation": "Italy",
   "friendTimeZone": "Europe/Rome",
   "yourTimeZone": "Asia/Manila",
+  "musicUrl": "assets/ash-birthday-piano.mp3",
+  "musicExpiresAt": "2026-11-07T23:00:00Z",
   "letterParagraphs": [
     "Miladyyy, Happy Birthdayyy!! :D",
     "Well, I was trying to think of what to make for your birthday this year. I've already made you videos before, including the one with the lyre, so I thought I'd try something different. Somehow I ended up making an entire book. I don't know how that happened either HAHAHA. I just hope you'll like it.",

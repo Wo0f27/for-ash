@@ -382,6 +382,8 @@
   const musicLabel = $('#music-label');
   const AC = window.AudioContext || window.webkitAudioContext;
   let playingMusic = false, audioContext = null, musicTimer = null, trackAudio = null, chordStep = 0;
+  let trackExpiryTimer = null;
+  const musicExpiry = Date.parse(cfg.musicExpiresAt || '');
   function playChord() {
     if (!audioContext || audioContext.state !== 'running') return;
     const chords = [
@@ -407,10 +409,14 @@
   async function setMusic(enabled) {
     if (enabled) {
       try {
-        if (typeof cfg.musicUrl === 'string' && cfg.musicUrl.trim()) {
+        if (typeof cfg.musicUrl === 'string' && cfg.musicUrl.trim() &&
+            (!Number.isFinite(musicExpiry) || Date.now() < musicExpiry)) {
           trackAudio = new Audio(cfg.musicUrl.trim());
-          trackAudio.loop = true; trackAudio.volume = .24;
+          trackAudio.loop = true; trackAudio.volume = .22;
           await trackAudio.play();
+          if (Number.isFinite(musicExpiry)) {
+            trackExpiryTimer = setTimeout(() => setMusic(false), Math.max(0, musicExpiry - Date.now()));
+          }
         } else {
           if (!AC) throw new Error('Web Audio unavailable');
           audioContext = new AC();
@@ -426,6 +432,7 @@
     } else {
       playingMusic = false;
       clearInterval(musicTimer); musicTimer = null;
+      clearTimeout(trackExpiryTimer); trackExpiryTimer = null;
       if (trackAudio) {trackAudio.pause();trackAudio.currentTime=0;trackAudio=null;}
       if (audioContext) {audioContext.close().catch(()=>{});audioContext=null;}
     }

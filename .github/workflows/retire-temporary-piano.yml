@@ -1,0 +1,28 @@
+name: Retire temporary birthday piano
+
+on:
+  schedule:
+    # November 8 at 00:00 in Italy (CET) = November 7 at 23:00 UTC.
+    - cron: '0 23 7 11 *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  remove-temporary-audio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove recording from the published branch
+        shell: bash
+        run: |
+          if [ ! -f assets/ash-birthday-piano.mp3 ]; then
+            echo "Temporary recording already absent."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -- assets/ash-birthday-piano.mp3
+          git commit -m "Remove time-limited birthday piano recording"
+          git push origin HEAD:main

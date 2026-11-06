@@ -72,3 +72,12 @@ are needed. The existing StPageFlip CDN is unchanged.
 - Normal left/right taps turn pages. A **double-tap in the center 28% of the book** completes currently visible typewriter text without flipping. A single tap there still navigates after a 340 ms gesture window.
 - The **Show text now** controls are removed; personal messages remain unchanged.
 - The space outside the paper now uses a restrained indigo/teal night sky, stars and moonlight. Reduced-motion settings disable the subtle twinkle.
+
+
+## Temporary birthday piano recording (November 2026)
+
+The file `assets/ash-birthday-piano.mp3` is a **temporary** recording supplied under a limited birthday-use permission. This is not an open-source audio asset, and it must not be reused or redistributed as part of the site's MIT-licensed code.
+
+The music control uses `config.js` `musicUrl` to play it at 22% volume when selected. Browser autoplay remains disabled. `musicExpiresAt` is `2026-11-07T23:00:00Z`, which equals **November 8, 2026, at 00:00 in Italy**. At this cutoff the page stops the recording and falls back to the site's original synthesized instrumental on subsequent starts.
+
+The GitHub Actions workflow `.github/workflows/retire-temporary-piano.yml` is scheduled to delete the public audio asset after the birthday. **Scheduled Actions may be delayed or blocked by repository permissions**; verify that the file is gone on November 8 and manually remove it if necessary. Deleting a file from the latest branch does not erase earlier Git commit history, so consult the permission holder if a complete public-history purge is required.
