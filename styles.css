@@ -312,3 +312,5 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 @media(min-width:851px) {
   .book-shell { height: clamp(610px, calc(100svh - 190px), 810px); }
 }
+/* Let the paper scroll vertically while horizontal swipes turn pages. */
+.book-shell { touch-action: pan-y; }
