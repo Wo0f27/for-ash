@@ -100,6 +100,11 @@
     book.append(sheet);
   }
 
+  // Seed the original birthday wish before the reusable typewriter indexes text.
+  $$('[data-birthday-wish]',book).forEach(el => {
+    el.textContent = cfg.birthdayWish || '[Add your final birthday wish in config.js.]';
+  });
+
   // All extras live inside the existing StPageFlip HTML sheets.
   const extras = window.StorybookExtras?.init({ book, pageDefs, reducedMotion });
 
@@ -168,7 +173,10 @@
     });
     $$('[data-birthday-wish]', book).forEach(el => {
       el.hidden = !wishMade;
-      el.textContent = cfg.birthdayWish || '[Add your final birthday wish in config.js.]';
+      // Once wrapped in reserved-width glyphs, rewriting textContent would
+      // destroy its characters and reset the slow reveal on every page flip.
+      if (!el.classList.contains('tw-target'))
+        el.textContent = cfg.birthdayWish || '[Add your final birthday wish in config.js.]';
     });
   }
   function confetti(root) {
