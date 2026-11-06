@@ -1,51 +1,40 @@
-# The Pages Between Us — birthday site (v3)
+# The Pages Between Us — birthday site (Version 4)
 
-A mobile-friendly, self-contained birthday storybook. There are **no frameworks, build steps, trackers, or paid dependencies**.
+An interactive, mobile-first birthday storybook for Ash. It is a static GitHub Pages website: no framework, build step, accounts, trackers, or paid hosting required.
 
-## Animated storybook interactions (v3)
+## What changed in Version 4
 
-- Tap the book cover or **Open the story**: the cover turns on its hinge and reveals chapter one.
-- Use the **Turn to the next page** links or chapter navigation to trigger a paper-turn transition.
-- Watch the typewriter note appear in the Wattpad-era chapter.
-- Tap the memory cards to reveal their messages immediately (no unreliable 3D backface rendering). Open the envelope and watch its letter peek out, then blow out the candles for smoke and confetti.
-- Mobile-friendly: tested at 320, 390, and 430 pixels plus tablet and desktop. Decorative elements do not extend the layout beyond the phone width.\n- Full-screen paper transitions mask destination changes so navigation does not flash two chapters.\n- Reduced-motion settings are respected. The site remains a scrollable story rather than a rigid slideshow.
+- **Opening cover:** the book is fully visible near the top on narrow phones. Tapping it reveals the inside page, then smoothly takes the reader to Chapter One. No unrelated wipe interrupts the opening.
+- **Chapter transitions:** a single full-screen paper sheet covers the old chapter, navigation takes place behind the covered screen, and the sheet moves off to reveal the destination. These two stages are sequenced by animation completion rather than arbitrary fixed scroll timings.
+- **Memory notes:** a two-part 2D turnover changes the visible face midway through the first tap, rather than relying on a brittle 3D backface repaint. Rapid taps during the short turnover are ignored to prevent desynchronization.
+- **Letter:** the actual letter emerges from the envelope into an accessible scrollable overlay. There is no second paper that appears underneath. The close button, Escape key, and tapping the backdrop dismiss the letter, returning focus to the envelope.
+- **Mobile layout:** larger text, more compact chapter spacing, visible opening book, and a **Chapters** menu at the top of the phone layout.
+- **Accessibility:** minimum-size tap targets, keyboard support, readable contrast, and reduced-motion handling.
 
-## Edit your own words
+## Your words stay yours
 
-Open **config.js** using VS Code or Notepad. Change:
+Only edit `config.js` when you're ready:
 
-- `recipientName`: displayed name (currently the provisional nickname "Ash")
-- `senderName`: your signature
-- `birthdayYear`: the year on the letter
-- `letterParagraphs`: write your OWN letter; keep each paragraph inside quotes, separated by commas
-- `birthdayWish`: a short line revealed after the candles go out
-- `notes`: customize the four clickable memory notes
-- `friendLocation` and `friendTimeZone`: the Italy details are provisional, so correct them if needed.
+- `recipientName`: currently uses provisional nickname `Ash`.
+- `senderName`: your signature.
+- `letterParagraphs`: your birthday message, one quoted paragraph per entry.
+- `birthdayWish`: message shown after blowing out the candles.
+- `notes`: four interactive inside-joke cards.
+- `friendLocation` and `friendTimeZone`: confirm the provisional Italy details (`Europe/Rome`).
 
-Please replace the visible bracketed placeholders before sending the link. The provided text is UI copy, **not** a drafted private letter.
+**The letter and birthday wish are intentionally placeholders.** Replace bracketed text before sharing the website.
 
-## Preview before uploading
+## Where it's hosted
 
-Double-click **index.html** to preview in a browser. Everything works without a web server. Test by clicking the notes, envelope, candles, and final surprise. For the best mobile preview in Chrome/Opera, press `F12`, then toggle the device toolbar.
+GitHub repository: https://github.com/Wo0f27/for-ash  
+GitHub Pages: https://wo0f27.github.io/for-ash/
 
-## Publish to GitHub Pages
+This repository is already configured for GitHub Pages. Commits to `main` should deploy automatically. To see deployment status, check the repository's **Actions** tab or **Settings → Pages**.
 
-1. This repository has already been created. Repository: `Wo0f27/for-ash`.
-2. Website files are already committed in the repository root. Further changes made here can be published automatically.
-3. In that repository, open **Settings → Pages**.
-4. Under **Build and deployment**, set **Source** to `Deploy from a branch`.
-5. Select `main` and `/ (root)`, then Save.
-6. The site should appear at `https://wo0f27.github.io/for-ash/` after GitHub finishes deployment. In GitHub **Settings → Pages**, use **Visit site** to see your actual published address.
+To preview locally, open `index.html` in a browser (or serve the folder with any static HTTP server). There is no build command.
 
-No build command or GitHub Actions workflow is required.
+## Testing and privacy
 
-Official guide: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+Version 4 was interaction-tested in headless Chromium mobile emulation at 320, 360, 390, and 430 px, plus 768 px tablet and 1440 px desktop widths. The opening cover, chapter navigation, note turnover in both directions, envelope dialog opening/closing, candles, and mobile menu passed. No runtime JavaScript errors or horizontal overflow were detected in these tests. Actual-device browser testing remains recommended.
 
-## Privacy and other notes
-
-- **GitHub Pages is publicly accessible.** Even with a private repository on an eligible plan, a published Pages site itself is publicly accessible. Avoid uploading private chats, contact details, or sensitive stories. `noindex` discourages search engines but is **not** privacy protection.
-- The hidden surprise links to YouTube in a new tab; it does not embed or autoplay any copyrighted song.
-- Do not add personal photographs without permission.
-- No auto-playing audio is included; we can add an opt-in music toggle if you provide a permitted audio track.
-- The two clocks use built-in browser `Intl` time-zone support and automatically account for daylight saving time.
-- This is **version 3**, so all design/content may still be customized before publishing.
+The site and its repository are public. Never place private screenshots, passwords, addresses, sensitive stories, or other private information into this repository. The hidden birthday surprise links to YouTube only when clicked; it does not embed or autoplay a song.

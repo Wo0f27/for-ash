@@ -8,10 +8,10 @@
   <meta name="robots" content="noindex,nofollow">
   <title>The Pages Between Us · A Birthday Story</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}</style></noscript>
   <script src="config.js" defer></script>
-  <script src="script.js?v=3" defer></script>
+  <script src="script.js?v=4" defer></script>
 </head>
 <body>
   <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
@@ -20,7 +20,7 @@
   <div class="ambient ambient-two" aria-hidden="true"></div>
 
   <div class="page-turn-overlay" id="page-turn-overlay" aria-hidden="true">
-    <div class="page-turn-paper"><div class="page-turn-ornament">✧</div><span>the next page</span></div>
+    <div class="page-turn-paper"><span class="page-turn-ornament">✧</span><span id="transition-label">the next page</span></div>
   </div>
 
   <header class="site-header">
@@ -34,6 +34,16 @@
       <a href="#chapter-four">Your letter</a>
       <a href="#chapter-five">A wish</a>
     </nav>
+    <details class="chapter-menu">
+      <summary>Chapters <span aria-hidden="true">⌄</span></summary>
+      <nav aria-label="Jump to a chapter">
+        <a href="#chapter-one">01 · Wattpad</a>
+        <a href="#chapter-two">02 · Little chaos</a>
+        <a href="#chapter-three">03 · Across the miles</a>
+        <a href="#chapter-four">04 · Your letter</a>
+        <a href="#chapter-five">05 · Birthday wish</a>
+      </nav>
+    </details>
     <a class="header-end" href="#chapter-five">07 · 11 <span aria-hidden="true">✳</span></a>
   </header>
 
@@ -50,7 +60,7 @@
         <a class="button button-primary" href="#chapter-one" id="begin-story">Open the story <span aria-hidden="true">↗</span></a>
         <p class="hero-tiny">For the best experience: find a cozy spot, then take your time.</p>
       </div>
-      <div class="hero-art" data-reveal aria-label="Illustrated green storybook with flowers and stars" role="img">
+      <div class="hero-art" data-reveal>
         <div class="art-back-shadow"></div>
         <div class="flower flower-top" aria-hidden="true"><span>✿</span></div>
         <div class="flower flower-bottom" aria-hidden="true"><span>✳</span></div>
@@ -130,9 +140,9 @@
             <div class="sky-caption">same sky, different hours</div>
           </div>
           <div class="clocks">
-            <div class="clock-card"><span class="clock-place">your side</span><strong id="clock-ph">--:--</strong><span class="clock-city">Philippines</span></div>
+            <div class="clock-card"><span class="clock-place">The Philippines</span><strong id="clock-ph">--:--</strong><span class="clock-city">Philippines</span></div>
             <span class="clocks-divider" aria-hidden="true">↔</span>
-            <div class="clock-card"><span class="clock-place">her side*</span><strong id="clock-it">--:--</strong><span class="clock-city" id="friend-city">Italy</span></div>
+            <div class="clock-card"><span class="clock-place">Across the miles</span><strong id="clock-it">--:--</strong><span class="clock-city" id="friend-city">Italy</span></div>
           </div>
           <p class="clock-note">* The Italy location is a placeholder you can change in config.js.</p>
         </div>
@@ -155,22 +165,16 @@
           <p>Some things deserve more than a passing notification.</p>
         </div>
         <div class="envelope-stage" data-reveal>
-          <button class="envelope-button" id="open-letter" aria-expanded="false" aria-controls="letter-content" aria-label="Open the birthday letter">
-            <span class="envelope">
+          <button class="envelope-button" id="open-letter" type="button" aria-haspopup="dialog" aria-label="Open the birthday letter" aria-controls="letter-backdrop">
+            <span class="envelope" aria-hidden="true">
               <span class="envelope-back"></span>
-              <span class="envelope-peek" aria-hidden="true"><span>For <span data-recipient>Ash</span>,</span><i>✦</i><span>with a little appreciation ♡</span></span>
               <span class="envelope-flap"></span>
               <span class="envelope-front"></span>
               <span class="envelope-seal">♡</span>
             </span>
             <span class="envelope-label" id="envelope-label">Tap to break the seal</span>
           </button>
-          <article class="actual-letter" id="letter-content" hidden>
-            <p class="letter-date">November 7, <span data-year>2026</span></p>
-            <h3>Dear <span data-recipient>Ash</span>,</h3>
-            <div id="letter-paragraphs" class="letter-paragraphs"></div>
-            <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
-          </article>
+          <p class="envelope-caption">A little letter to unfold, whenever you're ready.</p>
         </div>
       </div>
             <a class="chapter-next" href="#chapter-five"><span class="chapter-next-rule" aria-hidden="true"></span>Turn to the next page <strong>The birthday wish</strong><span aria-hidden="true">↗</span></a>
@@ -218,5 +222,16 @@
       <a href="#home" class="back-top">Back to the first page ↑</a>
     </footer>
   </main>
+  <div id="letter-backdrop" class="letter-backdrop" hidden>
+    <article class="actual-letter" id="letter-content" role="dialog" aria-modal="true" aria-labelledby="letter-dialog-title" tabindex="-1">
+      <button id="close-letter" class="letter-close" type="button" aria-label="Close the letter"><span aria-hidden="true">×</span><span>Close</span></button>
+      <div class="letter-inner">
+        <p class="letter-date">November 7, <span data-year>2026</span></p>
+        <h3 id="letter-dialog-title">Dear <span data-recipient>Ash</span>,</h3>
+        <div id="letter-paragraphs" class="letter-paragraphs"></div>
+        <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
+      </div>
+    </article>
+  </div>
 </body>
 </html>
