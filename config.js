@@ -1,4 +1,4 @@
-/* Birthday content for Ash, approved for publication. Edit these messages any time. */
+/* Personalized birthday messages for Ash. Edit these messages anytime. */
 window.BIRTHDAY_CONFIG = {
   "recipientName": "Ash",
   "senderName": "Woof",
@@ -7,40 +7,40 @@ window.BIRTHDAY_CONFIG = {
   "friendTimeZone": "Europe/Rome",
   "yourTimeZone": "Asia/Manila",
   "letterParagraphs": [
-    "Miladyyy, happy birthday!! :D",
-    "I was trying to figure out what to give you this year. You've already survived the birthday videos from 2022 and 2024, and I still remember how excited you were about the lyre in the second one. Another video seemed too predictable. So, naturally, I made an entire book instead. I hope Ms. Ilaria appreciates my extremely reasonable decisions. HAHAHA.",
-    "Sometimes I think about how we met on Wattpad. We started with stories, found our way to Discord, and somehow kept talking long after so much of the old Wattpad stuff disappeared. There have been quiet stretches when life got busy, but I like that we can still pick up a conversation and find something ridiculous to talk about.",
-    "Lately, I feel like half our conversations have turned into Genshin lore hearings. One day it's Arlecchino's birthday art tempting you to pull again. Another day you're explaining why Ronova absolutely has to return, or insisting Capitano will be playable someday. Then Flins, Lohen, Noy, Mitya, and Durin enter the conversation, and suddenly your wishlist has become another entire storyline. I don't always know how to keep up, but I enjoy hearing you get excited about these things. XD",
-    "I also wanted to tell you something a little more seriously. I remember that night in July when I had a lot on my mind and you gave me room to talk. You didn't make me feel like I was being a bother. Across the years, you've also checked if I've eaten, reminded me to rest, and remembered the small things. I may joke around a lot, but I appreciate that more than I probably say.",
-    "I hope you get some breathing room between studying, exams, and everything else you've been handling. I hope you find stories worth losing yourself in, and have more ordinary days that feel good without needing anything extraordinary to happen. Please remember to take care of yourself too. Yes, I'm returning the reminder for once. T_T",
-    "Thank you for being my friend, Ash. It's strange to think that one writing app introduced me to someone I'd still be calling milady years later. I'm really glad it did.",
-    "Happy birthday once again!"
+    "Miladyyy, Happy Birthdayyy!! :D",
+    "Well, I was trying to think of what to make for your birthday this year. I've already made you videos before, including the one with the lyre, so I thought I'd try something different. Somehow I ended up making an entire book. I don't know how that happened either HAHAHA. I just hope you'll like it.",
+    "Sometimes it still surprises me that we met on Wattpad of all places. I remember how we used to talk there, and how much of it disappeared when they removed the private messages. We don't always get the chance to talk when life gets busy, but when we do, we somehow end up chatting about all sorts of things again. I'm really glad we kept in touch.",
+    "Of course, I can't forget your Genshin theories. At this point I've heard enough about Ronova and Capitano to know that you're not giving up on either of them anytime soon XD. And yes, I'll probably keep teasing you about Arle. It's honestly fun hearing you get excited about these things, even when I have no idea where the conversation will go next hahaha.",
+    "I also wanted to thank you again for keeping me company that night in July. I had a lot on my mind and you still stayed to listen, even though you had your own things going on. I really appreciated it, milady. I also notice the little things, like when you ask if I've eaten or remind me to sleep. Which is funny because sometimes you're still awake too HAHAHA.",
+    "I know you've had a lot going on with university, so I hope you'll get more time to rest and enjoy yourself this year. You did good getting through your thesis, Ms. Ilaria. I wish you all the best with your studies and whatever you plan to do next. And please take care of yourself too.",
+    "Anyway, thank you for being my friend. I'm glad that we met, and I hope we'll still have more random conversations to look back on in the future.",
+    "Happy Birthdayyy again, miladyyy! :D"
   ],
   "notes": [
     {
       "icon": "✿",
       "title": "Sea Doggos",
-      "subtitle": "a very important classification",
-      "reveal": "SEALS ARE THE DOGGOS OF THE SEA. You calling that cute only strengthened my case, and I will not be hearing objections. XD"
+      "subtitle": "a very important discovery",
+      "reveal": "SEALS ARE THE DOGGOS OF THE SEA. You said it sounded cute, so I guess that officially settles it hahaha."
     },
     {
       "icon": "✦",
-      "title": "The Genshin Prophecy",
-      "subtitle": "the lore hearings continue",
-      "reveal": "According to Ms. Ilaria's entirely reliable predictions, Ronova WILL return and Capitano WILL become playable. Source: trust her. Honestly, I admire the dedication. HAHAHA."
+      "title": "Ms. Ilaria's Prophecy",
+      "subtitle": "just trust her XD",
+      "reveal": "Ronova will return and Capitano will be playable. I don't know how much more coping this will take, but I'm rooting for you too hahaha."
     },
     {
       "icon": "📖",
       "title": "The Open Tabs",
-      "subtitle": "surely just one more",
-      "reveal": "One fanfic somehow becomes five Link Click tabs. And now you've got Flins and Lohen stories to talk about too. At this point, the tabs have their own extended universe."
+      "subtitle": "just one more fanfic",
+      "reveal": "Remember those five Link Click fanfic tabs? I'm wondering how many more you've opened since then XD."
     },
     {
       "icon": "☕",
       "title": "Soup & Fork",
-      "subtitle": "the philosophy persists",
-      "reveal": "LIFE'S A SOUP AND IM THE FORK. You said it, and I still don't think I can improve on that. Please accept this imaginary spoon."
+      "subtitle": "words of wisdom",
+      "reveal": "LIFE'S A SOUP AND IM THE FORK. I still don't know how to respond to that. HAHAHA."
     }
   ],
-  "birthdayWish": "Happy birthday, Ms. Ilaria! I hope this year treats you a little more kindly than the story has treated Ronova and Capitano. May your next pulls actually cooperate with your ever-growing wishlist, whether it ends up being Durin, Noy, Mitya, or someone completely unexpected. More importantly, I hope you get time to rest, read things you love, and enjoy the days ahead. Take care of yourself, milady! :D"
+  "birthdayWish": "Happy Birthdayyy, Ms. Ilaria! I wish you good luck with uni, your plans, and yes, your Genshin pulls too hahaha. I hope this year will be a good one for you. Please take care of yourself, and enjoy your day, miladyyy! :D"
 };
