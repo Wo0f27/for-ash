@@ -96,13 +96,6 @@
       states.push(st);
       if(reducedMotion.matches) complete(st);
     });
-    $$('.book-sheet:not(.sheet-cover)',book).forEach(sheet=>{
-      const inner=$('.page-inner',sheet);
-      if(!inner)return;
-      const button=document.createElement('button');button.className='tw-skip';button.type='button';
-      button.dataset.twSkip=sheet.dataset.pageIndex;button.textContent='Show text now ✧';button.hidden=true;
-      inner.append(button);
-    });
 
     function complete(st) {
       if(st.done)return;
@@ -123,11 +116,11 @@
     function advance(st,onDone=()=>{}) {
       if(st.done || !visiblePages.has(st.pageIndex) || !allowed(st))return;
       if(typeTimers.has(st))return;
-      if(reducedMotion.matches) {complete(st);onDone();updateSkip(st.pageIndex);return;}
+      if(reducedMotion.matches) {complete(st);onDone();return;}
       const next=()=>{
         typeTimers.delete(st);
         if(!visiblePages.has(st.pageIndex)||!allowed(st))return;
-        if(st.cursor>=st.chars.length) {st.done=true;st.target.dataset.twDone='true';onDone();updateSkip(st.pageIndex);return;}
+        if(st.cursor>=st.chars.length) {st.done=true;st.target.dataset.twDone='true';onDone();return;}
         const {el,char}=st.chars[st.cursor++];el.classList.add('is-written');
         let delay=speed;
         if(/[.!?]/.test(char))delay+=210;
@@ -135,7 +128,7 @@
         else if(char==='\n')delay+=270;
         const t=setTimeout(next,delay);typeTimers.set(st,t);
       };
-      next();updateSkip(st.pageIndex);
+      next();
     }
     function runBase(pageIndex) {
       if(!visiblePages.has(pageIndex))return;
@@ -144,7 +137,7 @@
       const loop=()=>{
         if(!visiblePages.has(pageIndex)){baseRunners.delete(pageIndex);return;}
         const pending=states.find(st=>st.pageIndex===pageIndex&&st.category==='main'&&!st.done);
-        if(!pending) {baseRunners.delete(pageIndex);updateSkip(pageIndex);return;}
+        if(!pending) {baseRunners.delete(pageIndex);return;}
         advance(pending,loop);
       };
       loop();
@@ -152,7 +145,7 @@
     function startIn(node) {
       if(!node)return;
       for(const st of states)if(!st.done&&node.contains(st.target)&&st.category!=='main'&&allowed(st))advance(st,()=>{});
-      const sheet=node.closest('.book-sheet');if(sheet)updateSkip(Number(sheet.dataset.pageIndex));
+      const sheet=node.closest('.book-sheet');
     }
     function stopPage(index) {
       for(const st of states){
@@ -161,19 +154,14 @@
       }
       baseRunners.delete(index);
     }
-    function updateSkip(pageIndex) {
-      const button=$(`[data-tw-skip="${pageIndex}"]`,book);
-      if(!button)return;
-      button.hidden=!visiblePages.has(pageIndex)||!states.some(st=>st.pageIndex===pageIndex&&!st.done&&allowed(st));
-    }
-    function isPageTyping(pageIndex) {
-      return visiblePages.has(pageIndex)&&states.some(st=>st.pageIndex===pageIndex&&!st.done&&allowed(st));
-    }
     function finishPage(pageIndex) {
       for(const st of states)if(st.pageIndex===pageIndex&&!st.done&&allowed(st))complete(st);
-      baseRunners.delete(pageIndex);updateSkip(pageIndex);
+      baseRunners.delete(pageIndex);
     }
-    function isTapToSkip(target) { return !!target.closest('[data-tw-skip]'); }
+    // A deliberate center double tap finishes only visible, already-unlocked text.
+    function finishVisible() {
+      for(const index of visiblePages)finishPage(index);
+    }
 
     const scene=$('[data-bloom-scene]',book);
     function replayBloom() {
@@ -195,7 +183,6 @@
         if(sheet) {
           initScratchOnPage(sheet);
           $$('.memory-card.is-revealed, .letter-world.is-extracted, .mini-envelope.is-open, .scratch-card.is-revealed, .birthday-wish:not([hidden])',sheet).forEach(startIn);
-          updateSkip(n);
         }
       }
       if(enteredBloom)replayBloom();
@@ -284,8 +271,6 @@
     // Called at the top of the existing book click delegation. Returning true
     // means the interaction belongs to this feature, not to page navigation.
     function handleClick(event) {
-      const button=event.target.closest('[data-tw-skip]');
-      if(button) {finishPage(Number(button.dataset.twSkip));return true;}
       const mini=event.target.closest('[data-mini-toggle]');
       if(mini){
         const card=mini.closest('.mini-envelope');
@@ -304,7 +289,7 @@
     // Allow the existing book navigation to distinguish typing/scratching from
     // a deliberate left/right page-tap. Text itself remains tappable to skip.
     function isInteractive(target) {
-      return !!target.closest('.scratch-card,.mini-envelope,.garden-frame,[data-bloom-replay],[data-tw-skip]');
+      return !!target.closest('.scratch-card,.mini-envelope,.garden-frame,[data-bloom-replay]');
     }
     window.addEventListener('resize',()=>{
       for(const n of visiblePages){const sheet=$(`.book-sheet[data-page-index="${n}"]`,book);if(sheet)initScratchOnPage(sheet);}
@@ -313,7 +298,7 @@
       if(document.hidden)for(const n of visiblePages)stopPage(n);
       else for(const n of visiblePages){runBase(n);const sheet=$(`.book-sheet[data-page-index="${n}"]`,book);if(sheet)$$('.mini-envelope.is-open,.scratch-card.is-revealed,.letter-world.is-extracted',sheet).forEach(startIn);}
     });
-    return {showPage, handleClick, isInteractive, isTapToSkip, startIn, finishPage, replayBloom, revealScratch};
+    return {showPage, handleClick, isInteractive, startIn, finishPage, finishVisible, replayBloom, revealScratch};
   }
   window.StorybookExtras={init};
 })();

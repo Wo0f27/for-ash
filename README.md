@@ -65,3 +65,10 @@ flowers and scratch cards. The animated garden is an original book-sized SVG
 adaptation of the flower technique; the scratch card uses the reference's
 canvas erasing principle. No new backend, package manager or external images
 are needed. The existing StPageFlip CDN is unchanged.
+
+
+## Version 12 — night sky and center double-tap
+
+- Normal left/right taps turn pages. A **double-tap in the center 28% of the book** completes currently visible typewriter text without flipping. A single tap there still navigates after a 340 ms gesture window.
+- The **Show text now** controls are removed; personal messages remain unchanged.
+- The space outside the paper now uses a restrained indigo/teal night sky, stars and moonlight. Reduced-motion settings disable the subtle twinkle.

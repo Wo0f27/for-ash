@@ -28,6 +28,7 @@
   let letterTimer = 0;
   let wishMade = false;
   let pointerStart = null;
+  let pendingCenterTap = null;
   let letterPointer = null;
   let confettiTimer = 0;
   let lastTurn = 0;
@@ -296,7 +297,41 @@
     if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.45) { flip(dx < 0 ? 1 : -1); return; }
     if (Math.abs(dx) > 15 || Math.abs(dy) > 15) return;
     const rect = book.getBoundingClientRect();
-    flip(event.clientX >= rect.left + rect.width / 2 ? 1 : -1);
+    const xFraction = (event.clientX - rect.left) / rect.width;
+    const direction = xFraction >= .5 ? 1 : -1;
+    // Center-only double tap: allow the second tap without triggering a flip.
+    // Ordinary single center taps still navigate after the 340 ms gesture window.
+    if (xFraction >= .36 && xFraction <= .64) {
+      const now = performance.now();
+      const existing = pendingCenterTap;
+      if (existing && now - existing.at <= 340 &&
+          existing.page === currentIndex() &&
+          Math.hypot(event.clientX - existing.x, event.clientY - existing.y) <= 42) {
+        clearTimeout(existing.timer);
+        pendingCenterTap = null;
+        extras?.finishVisible?.();
+        return;
+      }
+      if (existing) {
+        clearTimeout(existing.timer);
+        pendingCenterTap = null;
+        if (existing.page === currentIndex()) flip(existing.direction);
+      }
+      const tap = {at:now, x:event.clientX, y:event.clientY,
+                   page:currentIndex(), direction, timer:null};
+      pendingCenterTap = tap;
+      tap.timer = setTimeout(() => {
+        if (pendingCenterTap !== tap) return;
+        pendingCenterTap = null;
+        if (currentIndex() === tap.page) flip(tap.direction);
+      }, 340);
+      return;
+    }
+    if (pendingCenterTap) {
+      clearTimeout(pendingCenterTap.timer);
+      pendingCenterTap = null;
+    }
+    flip(direction);
   }, {passive:true});
   book.addEventListener('pointercancel', () => { pointerStart = null; });
   book.addEventListener('keydown', event => {
