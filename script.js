@@ -19,8 +19,6 @@
   const leafBack = $('#leaf-back');
   const left = $('#page-left');
   const right = $('#page-right');
-  const previous = $('#previous-page');
-  const next = $('#next-page');
   const progress = $('#progress-label');
   const dots = $('#progress-dots');
   const instructions = $('#book-instructions');
@@ -35,6 +33,8 @@
   let letterPointer = null;
   let confettiTimer = null;
   let resizeTimer = null;
+  let tapPointer = null;
+  let suppressPageTap = false;
   const revealedNotes = new Set();
   let letterOpen = false;
   let wishMade = false;
@@ -143,10 +143,8 @@
     const total = isMobile ? pages.length : Math.ceil(pages.length / 2);
     const position = isMobile ? current : Math.floor(current/2);
     const last = current + step >= pages.length;
-    previous.disabled = !isOpen || turning || current <= 0;
-    next.disabled = !isOpen || turning || last;
     progress.textContent = isOpen ? `Page ${position + 1} of ${total}` : 'A story for you';
-    instructions.textContent = isOpen ? 'Turn the page with the arrows, or swipe left and right.' : 'Tap the cover to open your book.';
+    instructions.textContent = isOpen ? 'Tap the left half to go back · tap the right half to go forward · or swipe.' : 'Tap the cover to open your book.';
     dots.replaceChildren();
     for (let i = 0; i < total; i++) {
       const dot = document.createElement('span');
@@ -295,7 +293,7 @@
 
   // Delegation survives page re-rendering and guarantees one-tap card updates.
   book.addEventListener('click',event=>{
-    if (turning) return;
+    if (turning || suppressPageTap || !isOpen) return;
     const card=event.target.closest('[data-card]');
     if(card) {
       const id=Number(card.dataset.card);
@@ -329,23 +327,40 @@
       book.classList.add('is-closed');
       book.classList.remove('is-opening','is-turning');
       renderStationary(0);renderControls();
+      return;
     }
+    // Page clicks only; never steal interactions from links, memory cards,
+    // scrollable letters, cake controls or a selected text passage.
+    if (event.target.closest('button,a,[role="button"],input,textarea,select,[contenteditable]')) return;
+    if (event.detail === 0 || (window.getSelection && !window.getSelection().isCollapsed)) return;
+    const bounds = book.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right) return;
+    turnPage(event.clientX < bounds.left + bounds.width / 2 ? -1 : 1);
   });
 
   book.addEventListener('pointerdown',event=>{
     const sheet=event.target.closest('[data-letter-sheet]');
     letterPointer=sheet ? {x:event.clientX,y:event.clientY} : null;
+    tapPointer={x:event.clientX,y:event.clientY,time:performance.now(),pointerId:event.pointerId};
+    suppressPageTap=false;
     if(!isOpen || turning || event.target.closest('button,a,[role="button"]')) { lastPointer=null;return; }
     lastPointer={x:event.clientX,y:event.clientY,time:performance.now()};
   },{passive:true});
   book.addEventListener('pointerup',event=>{
+    if (tapPointer && event.pointerId === tapPointer.pointerId) {
+      const moved = Math.hypot(event.clientX-tapPointer.x,event.clientY-tapPointer.y)>15;
+      const held = performance.now()-tapPointer.time>850;
+      suppressPageTap = moved || held;
+      tapPointer=null;
+      if (suppressPageTap) setTimeout(()=>{suppressPageTap=false;},180);
+    }
     if(!lastPointer || !isOpen || turning) return;
     const dx=event.clientX-lastPointer.x;
     const dy=event.clientY-lastPointer.y;
     lastPointer=null;
     if(Math.abs(dx)>70 && Math.abs(dx)>Math.abs(dy)*1.45) turnPage(dx<0?1:-1);
   },{passive:true});
-  book.addEventListener('pointercancel',()=>{lastPointer=null;});
+  book.addEventListener('pointercancel',()=>{lastPointer=null;tapPointer=null;suppressPageTap=true;setTimeout(()=>{suppressPageTap=false;},180);});
   book.addEventListener('keydown',event=>{
     if(event.target.matches('[data-letter-sheet]') && (event.key==='Enter'||event.key===' ')) {
       event.preventDefault();letterOpen=false;updateLetter();
@@ -358,8 +373,6 @@
   });
 
   cover.addEventListener('click',openBook);
-  previous.addEventListener('click',()=>turnPage(-1));
-  next.addEventListener('click',()=>turnPage(1));
   smallScreen.addEventListener('change',()=>{
     clearTimeout(resizeTimer);
     resizeTimer=setTimeout(()=>{

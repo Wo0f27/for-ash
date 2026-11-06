@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
   <script src="config.js" defer></script>
-  <script src="script.js?v=8" defer></script>
+  <script src="script.js?v=9" defer></script>
 </head>
 <body>
   <main class="storybook-app" id="app">
@@ -58,14 +58,12 @@
     </div>
 
     <nav class="book-controls" aria-label="Book navigation">
-      <button type="button" class="nav-arrow" id="previous-page" disabled aria-label="Previous page"><span aria-hidden="true">←</span><span class="nav-text">Previous</span></button>
       <div class="book-progress">
         <div class="progress-label" id="progress-label" aria-live="polite">A story for you</div>
         <div class="progress-dots" id="progress-dots" aria-hidden="true"></div>
       </div>
-      <button type="button" class="nav-arrow nav-next" id="next-page" disabled aria-label="Next page"><span class="nav-text">Next page</span><span aria-hidden="true">→</span></button>
     </nav>
-    <p class="book-instructions" id="book-instructions">Start by tapping the book. Then use the page arrows or swipe to read.</p>
+    <p class="book-instructions" id="book-instructions">Tap the cover to open. Then tap the left or right half of the paper to turn pages.</p>
   </main>
 
   <template id="page-intro">
@@ -128,12 +126,10 @@
       <h2>Something<br><em>for you to read.</em></h2>
       <p class="page-lead">Some things deserve more than a passing notification.</p>
       <div class="letter-world" data-letter-world>
-        <div class="letter-envelope" data-letter-envelope aria-hidden="true">
-          <div class="env-back"></div>
-          <div class="env-flap"></div>
-          <div class="env-front"></div>
-          <div class="env-stamp">♡</div>
-        </div>
+        <!-- Layered like a real envelope: the paper rises behind the pocket,
+             while the flap folds back. Only the paper is readable/clickable. -->
+        <div class="env-back" aria-hidden="true"></div>
+        <div class="env-flap" aria-hidden="true"></div>
         <div class="letter-sheet" data-letter-sheet role="button" tabindex="-1" aria-label="Tap letter to fold it into the envelope" aria-hidden="true">
           <div class="sheet-inner">
             <small>November 7, <span data-year>2026</span></small>
@@ -142,6 +138,8 @@
             <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
           </div>
         </div>
+        <div class="env-front" aria-hidden="true"></div>
+        <div class="env-stamp" aria-hidden="true">♡</div>
         <button class="letter-tap-zone" data-letter-toggle type="button" aria-label="Open the birthday letter"><span aria-hidden="true">♡</span><span data-letter-label>Tap the envelope to open</span></button>
       </div>
       <p class="page-aside letter-aside">Once it's open, tap the paper again to put it back.</p>

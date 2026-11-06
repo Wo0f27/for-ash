@@ -183,31 +183,100 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 .time-card strong { font: 400 clamp(24px, 2.8vw, 34px) var(--serif); color: #3d5c4f; }
 .time-connection { color: #b29a7d; }
 
-/* In-book envelope: physically pull the SAME sheet out and tap it to return. */
+
+/* In-book stationery, adapted from physical layering ideas in MIT-licensed
+   yuktrium/3D-Love-Letter. Unlike the original, no framework or external assets. */
 .page-letter { position: relative; }
-.letter-world { position: relative; height: 365px; max-width: 420px; margin: 13px auto 0; isolation: isolate; }
-.letter-envelope { position: absolute; width: min(285px, 87%); height: 157px; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 4; pointer-events: none; }
-.env-back { position: absolute; inset: 0; border-radius: 3px; background: #e4c9a9; }
-.env-front { position: absolute; inset: 0; clip-path: polygon(0 0, 50% 62%, 100% 0, 100% 100%, 0 100%); background: #edd4b7; z-index: 4; }
-.env-front::after { content: ''; position: absolute; inset: 0; clip-path: polygon(0 100%,50% 40%,100% 100%); background: #dcb995b8; }
-.env-flap { position: absolute; z-index: 6; inset: 0 0 auto; height: 68%; background: #d4b391; clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: top; transition: transform .45s ease; }
-.env-stamp { position: absolute; z-index: 7; left: 50%; top: 62%; transform: translate(-50%,-50%); width: 38px; height: 38px; background: #b87879; border: 3px double #d9aa9e; border-radius: 50%; color: #ffefdc; font: 21px var(--serif); display: grid; place-items: center; transition: opacity .2s; }
-.letter-world.is-open .env-flap { transform: rotateX(175deg); z-index: 2; }
-.letter-world.is-open .env-stamp { opacity: 0; }
-.letter-sheet { position: absolute; top: 0; left: 50%; width: min(332px, 96%); height: 316px; overflow-y: auto; overscroll-behavior: contain; background: #fffdf5; border: 1px solid #e1d1b7; box-shadow: 3px 7px 19px #65583f34; padding: 18px 18px 23px; z-index: 3; transform-origin: center bottom; transform: translate(-50%, 175px) scale(.77,.34); opacity: 0; visibility: hidden;
-  pointer-events: none;
-  transition: transform .88s cubic-bezier(.23,.77,.17,1), opacity .18s ease, box-shadow .5s,
-              visibility 0s linear .88s; scrollbar-width: thin; }
-.letter-world.is-open .letter-sheet { transform: translate(-50%,0) scale(1); opacity: 1; visibility: visible; z-index: 8;
-  box-shadow: 5px 18px 30px #544d3e2d; pointer-events: auto; cursor: pointer;
-  transition: transform .88s cubic-bezier(.23,.77,.17,1) .12s,
-              opacity .32s ease .18s, box-shadow .5s, visibility 0s; }
+.letter-world {
+  --env-w: min(285px, 87%);
+  --env-h: 157px;
+  --env-bottom: 26px;
+  position: relative; height: 365px; max-width: 420px; margin: 13px auto 0;
+  isolation: isolate; perspective: 1250px;
+}
+.env-back, .env-front, .env-flap {
+  position: absolute; width: var(--env-w); height: var(--env-h);
+  left: 50%; bottom: var(--env-bottom); transform: translateX(-50%);
+  border-radius: 4px; pointer-events: none;
+}
+.env-back {
+  z-index: 1; background: #e5caab;
+  box-shadow: 0 10px 21px rgba(84,68,42,.18), inset 0 3px 10px rgba(126,94,55,.13);
+}
+.env-back::before {
+  content: ''; position: absolute; inset: 5px; opacity: .3;
+  background: linear-gradient(35deg,transparent 49.5%,#af9678 50%,transparent 50.5%),
+              linear-gradient(-35deg,transparent 49.5%,#af9678 50%,transparent 50.5%);
+}
+.env-front {
+  z-index: 5; background: #edd3b4;
+  clip-path: polygon(0 0,50% 57%,100% 0,100% 100%,0 100%);
+  box-shadow: inset 0 -2px 9px #b88e6740;
+}
+.env-front::after {
+  content: ''; position: absolute; inset: 0; background: #e0bd98c9;
+  clip-path: polygon(0 100%,50% 40%,100% 100%);
+}
+.env-flap {
+  z-index: 7; height: 68%; height: calc(var(--env-h) * .68);
+  bottom: calc(var(--env-bottom) + var(--env-h) * .32);
+  transform: translateX(-50%) rotateX(0);
+  transform-origin: 50% 0%; backface-visibility: visible;
+  background: linear-gradient(165deg,#d9b893,#cba47e);
+  clip-path: polygon(0 0,100% 0,50% 100%);
+  transition: transform .5s cubic-bezier(.36,.02,.18,1) .78s, z-index 0s linear .9s;
+}
+.env-stamp {
+  position: absolute; z-index: 8; left: 50%; bottom: calc(var(--env-bottom) + var(--env-h) * .38 - 19px);
+  transform: translateX(-50%); width: 38px; height: 38px; border-radius: 50%;
+  background: #b87879; border: 3px double #d9aa9e; color: #fff0de;
+  display: grid; place-items: center; font: 22px var(--serif);
+  box-shadow: 0 2px 5px #8d64602e; pointer-events: none;
+  transition: opacity .22s ease .83s, visibility 0s linear 1.05s;
+}
+.letter-sheet {
+  position: absolute; top: 0; left: 50%; width: min(332px,96%); height: 316px;
+  transform-origin: 50% 25%;
+  transform: translateX(-50%) translateY(174px) scale(.78,.40);
+  opacity: 0; visibility: hidden; pointer-events: none; z-index: 3;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: #fffdf5; border: 1px solid #e1d1b7;
+  box-shadow: 1px 3px 8px #65583f25;
+  padding: 18px 18px 23px; scrollbar-width: thin;
+  transition:
+    transform .83s cubic-bezier(.42,0,.64,.18) .12s,
+    opacity .2s ease .64s,
+    visibility 0s linear 1s,
+    z-index 0s linear .2s,
+    box-shadow .4s ease;
+}
+.letter-world.is-open .env-flap {
+  transform: translateX(-50%) rotateX(179deg);
+  z-index: 2;
+  transition: transform .5s cubic-bezier(.29,.75,.28,1), z-index 0s linear .5s;
+}
+.letter-world.is-open .env-stamp {
+  opacity: 0; visibility: hidden;
+  transition: opacity .18s ease, visibility 0s linear .2s;
+}
+.letter-world.is-open .letter-sheet {
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1; visibility: visible; z-index: 9;
+  pointer-events: auto; cursor: pointer;
+  box-shadow: 5px 18px 30px #544d3e2d;
+  transition:
+    transform .98s cubic-bezier(.18,.78,.16,1) .30s,
+    opacity .24s ease .34s,
+    visibility 0s,
+    z-index 0s linear .96s,
+    box-shadow .5s ease .6s;
+}
 .sheet-inner { position: relative; border: 1px solid #eee7d6; padding: 13px 13px 6px; min-height: 100%; }
 .sheet-inner small { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #b49a78; }
 .sheet-inner h3 { font: 400 22px var(--serif); margin: 21px 0; }
 .letter-prose p { color: #53685e; font-size: 13px; line-height: 1.85; margin-bottom: 14px; white-space: pre-line; }
 .letter-signoff { margin: 24px 0 0; color: #8b7868; font: italic 14px/1.9 var(--serif); }
-.letter-tap-zone { position: absolute; z-index: 9; width: 275px; max-width: 86%; height: 152px; left: 50%; bottom: 23px; transform: translateX(-50%); border: 0; background: transparent; color: transparent; cursor: pointer; }
+.letter-tap-zone { position: absolute; z-index: 10; width: 275px; max-width: 86%; height: 152px; left: 50%; bottom: 23px; transform: translateX(-50%); border: 0; background: transparent; color: transparent; cursor: pointer; }
 .letter-tap-zone > span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
 .letter-world.is-open .letter-tap-zone { pointer-events: none; }
 .letter-aside { text-align: center; font-size: 12px; margin-top: -1px !important; }
@@ -299,7 +368,7 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
   .page-aside { margin-top: 13px !important; }
   .letter-world { height: 330px; }
   .letter-sheet { width: min(315px, 95%); height: 287px; }
-  .letter-envelope { width: min(270px, 86%); height: 150px; }
+  .letter-world { --env-w: min(270px, 86%); --env-h: 150px; }
   .letter-aside { font-size: 11px; }
   .cake-scene { height: 225px; }
 }
@@ -312,7 +381,7 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
   .memory-card { min-height: 112px; padding: 9px 5px; }
   .card-front strong { font-size: 15px; }
   .card-back span { font-size: 11px; }
-  .letter-envelope { bottom: 19px; }
+  .letter-world { --env-bottom: 19px; }
   .letter-world { height: 310px; }
   .letter-sheet { height: 272px; }
   .book-instructions { font-size: 9px; }
@@ -332,8 +401,6 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 @media(min-width:851px) {
   .book-shell { height: clamp(610px, calc(100svh - 190px), 810px); }
 }
-/* Let the paper scroll vertically while horizontal swipes turn pages. */
-.book-shell { touch-action: pan-y; }
 
 /* V8 compositor / paper hygiene */
 .turn-leaf { will-change: transform; }
@@ -342,6 +409,16 @@ button:focus-visible, a:focus-visible, [role='button']:focus-visible { outline: 
 .book-shell.is-turning .book-gutter { z-index: 1; }
 @media (prefers-reduced-motion: reduce) {
   .turn-leaf-face::before { animation: none; opacity: 0; }
-  .letter-sheet { visibility: hidden; transition: none; }
-  .letter-world.is-open .letter-sheet { visibility: visible; transition: none; }
+  .letter-sheet { visibility: hidden; opacity: 0; transition: none; }
+  .letter-world.is-open .letter-sheet { visibility: visible; opacity: 1; z-index: 9; transition: none; }
+  .env-flap, .letter-world.is-open .env-flap { transition: none; }
 }
+
+/* V9: the book IS the navigation. Tap its left/right hemispheres. */
+.book-controls { justify-content: center; min-height: 36px; }
+.book-progress { min-width: 0; }
+.book-instructions { margin: 6px 0 8px; font-size: 11px; }
+.book-shell:not(.is-closed):not(.is-turning):not(.is-opening) .book-page { cursor: pointer; }
+.book-shell.is-turning .book-page { cursor: default; }
+.letter-world.is-open .letter-sheet { touch-action: pan-y; }
+@media(max-width:850px) { .book-controls { min-height: 35px; } }
