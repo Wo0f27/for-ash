@@ -8,10 +8,10 @@
   <meta name="robots" content="noindex,nofollow">
   <title>The Pages Between Us · A Birthday Story</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
   <noscript><style>[data-reveal]{opacity:1!important;transform:none!important}</style></noscript>
   <script src="config.js" defer></script>
-  <script src="script.js?v=4" defer></script>
+  <script src="script.js?v=5" defer></script>
 </head>
 <body>
   <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
@@ -164,8 +164,8 @@
           <h2 id="letter-title">There's something<br><em>I'd like you to read.</em></h2>
           <p>Some things deserve more than a passing notification.</p>
         </div>
-        <div class="envelope-stage" data-reveal>
-          <button class="envelope-button" id="open-letter" type="button" aria-haspopup="dialog" aria-label="Open the birthday letter" aria-controls="letter-backdrop">
+        <div class="envelope-stage" id="envelope-stage" data-reveal>
+          <button class="envelope-button" id="open-letter" type="button" aria-expanded="false" aria-label="Remove the birthday letter from the envelope" aria-controls="letter-extraction">
             <span class="envelope" aria-hidden="true">
               <span class="envelope-back"></span>
               <span class="envelope-flap"></span>
@@ -174,6 +174,17 @@
             </span>
             <span class="envelope-label" id="envelope-label">Tap to break the seal</span>
           </button>
+          <div class="letter-extraction" id="letter-extraction" hidden>
+            <article class="actual-letter" id="letter-content" aria-labelledby="letter-heading" tabindex="-1">
+              <button id="close-letter" class="letter-close" type="button" aria-label="Fold the letter and put it back in the envelope"><span aria-hidden="true">↩</span><span>Put it back</span></button>
+              <div class="letter-inner">
+                <p class="letter-date">November 7, <span data-year>2026</span></p>
+                <h3 id="letter-heading">Dear <span data-recipient>Ash</span>,</h3>
+                <div id="letter-paragraphs" class="letter-paragraphs"></div>
+                <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
+              </div>
+            </article>
+          </div>
           <p class="envelope-caption">A little letter to unfold, whenever you're ready.</p>
         </div>
       </div>
@@ -222,16 +233,5 @@
       <a href="#home" class="back-top">Back to the first page ↑</a>
     </footer>
   </main>
-  <div id="letter-backdrop" class="letter-backdrop" hidden>
-    <article class="actual-letter" id="letter-content" role="dialog" aria-modal="true" aria-labelledby="letter-dialog-title" tabindex="-1">
-      <button id="close-letter" class="letter-close" type="button" aria-label="Close the letter"><span aria-hidden="true">×</span><span>Close</span></button>
-      <div class="letter-inner">
-        <p class="letter-date">November 7, <span data-year>2026</span></p>
-        <h3 id="letter-dialog-title">Dear <span data-recipient>Ash</span>,</h3>
-        <div id="letter-paragraphs" class="letter-paragraphs"></div>
-        <p class="letter-signoff">With appreciation,<br><strong data-sender>Your friend</strong></p>
-      </div>
-    </article>
-  </div>
 </body>
 </html>

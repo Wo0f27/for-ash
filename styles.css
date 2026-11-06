@@ -448,11 +448,6 @@ body { overflow-x: clip; max-width: 100%; }
 .envelope-button.is-open .envelope-flap { transform:rotateX(172deg); }
 .envelope-button.is-open .envelope-seal { opacity:0; }
 .envelope-caption { margin:2px 0 0; font:italic 14px/1.5 var(--serif); color:#789180; text-align:center; }
-.letter-backdrop {
-  position:fixed; inset:0; z-index:250; display:grid; place-items:center;
-  padding: min(4vh,28px) 14px; overflow:hidden; background:rgba(37,53,47,.61);
-  backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);
-}
 .actual-letter {
   width:min(620px,100%); max-height:min(88dvh,900px); min-height:230px;
   overflow-y:auto; overscroll-behavior:contain;
@@ -471,7 +466,7 @@ body { overflow-x: clip; max-width: 100%; }
 .letter-close:hover { background:#e9efe7; }
 .letter-inner { clear:both; }
 .letter-paragraphs p { font-size:15px; line-height:1.85; overflow-wrap:anywhere; }
-html.letter-open,body.letter-open { overflow:hidden; }
+
 
 /* Birthday scene keeps the same soft, restrained style. */
 .candle-smoke { position:absolute; left:calc(50% - 5px); bottom:calc(100% + 5px); width:12px; height:24px; border-radius:70%; border-left:3px solid #c3b5aa; opacity:0; pointer-events:none; }
@@ -534,7 +529,6 @@ html.letter-open,body.letter-open { overflow:hidden; }
   .flip-back > span:first-child { font-size:16px; }
   .chaos-footnote { margin-top:25px; font-size:14px; }
   .distance-illustration { margin:0 auto; width:min(520px,100%); }
-  .letter-backdrop { padding:14px; }
   .envelope-stage { min-height:275px; }
   .envelope-button { padding:10px 12px; gap:20px; }
   .envelope { width:min(330px,76vw); height:210px; }
@@ -611,3 +605,96 @@ html.letter-open,body.letter-open { overflow:hidden; }
 .letter-date { margin-bottom:30px; }
 @media(max-width:500px) { .letter-close { margin:-9px -7px 22px auto; } }
 @media (max-width:355px) { .hero-art { height:272px; min-height:272px; } }
+
+/* V5 — An actual letter pulled from its envelope, within the chapter. */
+.envelope-stage {
+  isolation: isolate;
+  position: relative;
+  overflow: visible;
+  width: min(690px,100%);
+  margin: 0 auto;
+  min-height: 0;
+}
+.envelope-button { z-index: 6; margin: 0 auto; }
+.envelope-caption { position: relative; z-index: 1; margin: 25px 0 0; }
+.letter-extraction {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 5;
+  width: min(640px,100%);
+  margin: 0;
+  overflow: visible;
+  transform: translateX(-50%);
+}
+.letter-extraction[hidden] { display: none !important; }
+.envelope-stage.letter-on-top .letter-extraction { z-index: 12; }
+.actual-letter {
+  display: block;
+  position: relative;
+  width: 100%;
+  max-height: none;
+  min-height: 290px;
+  overflow: visible;
+  overscroll-behavior: auto;
+  padding: clamp(38px,5.5vw,70px);
+  margin: 0;
+  transform-origin: center top;
+  border: 1px solid #ddceb3;
+  border-radius: 3px;
+  background: linear-gradient(150deg,#fffdf7,#fff8eb 78%,#f8ecd5);
+  box-shadow: 4px 15px 30px #40554936, 1px 3px 0 #e6d2ad;
+  animation: none;
+  will-change: auto;
+}
+.actual-letter.letter-in-motion { will-change:transform; }
+.actual-letter::before { inset: 12px; }
+.letter-inner { clear: none; }
+.letter-close {
+  position: relative;
+  display: flex;
+  float: none;
+  margin: -18px -20px 28px auto;
+  top: auto;
+  left: auto;
+  width: max-content;
+  z-index: 4;
+  font-size: 12px;
+  padding: 10px 13px;
+  min-height: 44px;
+}
+.letter-close span:first-child { font-size: 21px; }
+.letter-date { margin-bottom: 31px; }
+.letter-is-open .envelope-caption { opacity:0; }
+@media(max-width:800px) {
+  .envelope-stage { width:min(620px,100%); }
+  .letter-extraction { width:min(610px,100%); }
+  .actual-letter { min-height: 300px; padding:36px clamp(23px,6vw,45px); }
+}
+@media(max-width:500px) {
+  .letter-extraction { width:100%; }
+  .actual-letter { padding:31px 21px 40px; }
+  .letter-close { margin:-11px -10px 27px auto; }
+  .letter-paragraphs p { font-size: 14px; line-height:1.85; }
+  .envelope-caption { font-size:13px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .actual-letter.letter-in-motion { will-change:auto; }
+}
+
+/* The printed words stay tucked away until the sheet has been extracted. */
+.actual-letter .letter-inner, .actual-letter .letter-close { transition:opacity 230ms ease; }
+.letter-extracting .actual-letter .letter-inner,
+.letter-extracting .actual-letter .letter-close,
+.letter-returning .actual-letter .letter-inner,
+.letter-returning .actual-letter .letter-close { opacity:0; }
+.letter-extracting .actual-letter::after,
+.letter-returning .actual-letter::after {
+  content:'✧  for you  ✧'; position:absolute; top:34%; left:0; right:0;
+  text-align:center; font:italic 20px var(--serif); color:#bb9d72;
+  pointer-events:none; letter-spacing:.04em;
+}
+@media(prefers-reduced-motion:reduce) {
+  .actual-letter .letter-inner, .actual-letter .letter-close {transition:none;}
+}

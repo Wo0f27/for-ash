@@ -206,84 +206,139 @@
   }
   updateClocks(); setInterval(updateClocks, 30000);
 
-  // The letter is one physical element. It flies out of its envelope into a
-  // readable, scrollable panel with a close button and proper focus handling.
+  // One continuous in-page letter: it starts tucked inside the envelope,
+  // rises above the seal, and unfolds into a readable sheet in Chapter Four.
+  // No fixed backdrop, modal, or page scroll lock.
   const letterContainer = $('#letter-paragraphs');
   (Array.isArray(config.letterParagraphs) ? config.letterParagraphs : []).forEach((paragraph) => {
-    const p = document.createElement('p'); p.textContent = String(paragraph); letterContainer.append(p);
+    const p = document.createElement('p');
+    p.textContent = String(paragraph);
+    letterContainer.append(p);
   });
   const envelopeButton = $('#open-letter');
-  const envelopeShape = envelopeButton.querySelector('.envelope');
-  const backdrop = $('#letter-backdrop');
-  const actualLetter = $('#letter-content');
+  const envelope = envelopeButton.querySelector('.envelope');
+  const letterStage = $('#envelope-stage');
+  const extraction = $('#letter-extraction');
+  const paper = $('#letter-content');
   const closeLetterButton = $('#close-letter');
-  let letterVisible = false;
+  let letterOpen = false;
   let letterBusy = false;
-  let restoreFocus = envelopeButton;
-  const getLetterStartTransform = () => {
-    const from = envelopeShape.getBoundingClientRect();
-    const to = actualLetter.getBoundingClientRect();
-    const dx = (from.left + from.width / 2) - (to.left + to.width / 2);
-    const dy = (from.top + from.height / 2) - (to.top + to.height / 2);
-    return `translate(${dx}px, ${dy}px) scale(${Math.max(.2, Math.min(.75, from.width / to.width * .72))}, ${Math.max(.15, Math.min(.5, from.height / to.height * .48))})`;
-  };
-  async function animateLetter(opening) {
+  let closedStageHeight = 0;
+
+  // The animation starts at the physical opening, not in the screen center.
+  // The sheet is the actual letter DOM node, not a second decorative copy.
+  function paperStartTransform(returning = false) {
+    const slot = envelope.getBoundingClientRect();
+    const target = paper.getBoundingClientRect();
+    const targetX = target.left + target.width / 2;
+    const targetY = target.top;
+    const slotX = slot.left + slot.width / 2;
+    // The closed stage centers the envelope higher than the expanded stage.
+    // Correct for that movement when the paper returns to its original slot.
+    const centeringShift = returning ? Math.max(0, (letterStage.getBoundingClientRect().height - closedStageHeight) / 2) : 0;
+    const slotY = slot.top + slot.height * .31 - centeringShift;
+    const sx = Math.max(.26, Math.min(.78, slot.width * .67 / target.width));
+    const sy = Math.max(.16, Math.min(.36, 125 / Math.max(target.height, 1)));
+    // transform origin at paper center top, so the starting top is the slot.
+    return `translate(${slotX - targetX}px, ${slotY - targetY}px) scale(${sx}, ${sy})`;
+  }
+  async function animatePaper(keyframes, ms, easing) {
     if (prefersReducedMotion.matches) return;
-    const small = getLetterStartTransform();
-    const keyframes = opening ? [
-      { transform:small, opacity:.90 }, { transform:'translate(0,0) scale(1)', opacity:1 }
-    ] : [
-      { transform:'translate(0,0) scale(1)', opacity:1 }, { transform:small, opacity:.85 }
-    ];
-    const animation = actualLetter.animate(keyframes, {
-      duration:opening ? 650 : 430,
-      easing: opening ? 'cubic-bezier(.22,.79,.22,1)' : 'cubic-bezier(.5,0,.8,.2)',
-      fill:'forwards'
-    });
+    const animation = paper.animate(keyframes, {duration:ms,easing,fill:'forwards'});
     try { await animation.finished; } finally { animation.cancel(); }
   }
+  function setLetterState(isOpen) {
+    letterStage.classList.toggle('letter-is-open',isOpen);
+    envelopeButton.classList.toggle('is-open',isOpen);
+    envelopeButton.setAttribute('aria-expanded',String(isOpen));
+    envelopeButton.setAttribute('aria-label',isOpen ? 'Letter removed from envelope' : 'Remove the birthday letter from the envelope');
+    $('#envelope-label').textContent = isOpen ? 'A letter, just for you' : 'Tap to break the seal';
+  }
   async function openLetter() {
-    if (letterVisible || letterBusy || changingPage) return;
+    if (letterBusy || letterOpen || changingPage) return;
     letterBusy = true;
-    restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : envelopeButton;
-    envelopeButton.classList.add('is-open');
-    $('#envelope-label').textContent = 'A letter, just for you';
+    letterOpen = true;
     try {
-      if (!prefersReducedMotion.matches) await pause(360); // let the envelope flap rise first
-      backdrop.hidden = false;
-      actualLetter.scrollTop = 0;
-      document.documentElement.classList.add('letter-open');
-      document.body.classList.add('letter-open');
-      const backdropFade = prefersReducedMotion.matches ? null : backdrop.animate([{ opacity:0 }, { opacity:1 }], {duration:260,easing:'ease-out'});
-      await animateLetter(true);
-      await backdropFade?.finished;
-      letterVisible = true;
-      closeLetterButton.focus({ preventScroll:true });
-    } finally { letterBusy = false; }
+      closedStageHeight = Math.ceil(letterStage.getBoundingClientRect().height);
+      letterStage.style.height = `${closedStageHeight}px`;
+      setLetterState(true);
+      extraction.hidden = false;
+      // The sheet is absolutely layered over the envelope, not laid out below it.
+      await nextFrame();
+      const naturalHeight = Math.ceil(paper.getBoundingClientRect().height + 86);
+      const stageOpenHeight = Math.max(closedStageHeight, naturalHeight);
+      const start = paperStartTransform();
+      paper.style.transform = start;
+      paper.style.opacity = '1';
+      paper.classList.add('letter-in-motion');
+      letterStage.classList.add('letter-extracting');
+      await pause(duration(265)); // flap opens before the paper moves
+      if (prefersReducedMotion.matches) {
+        letterStage.style.height = `${stageOpenHeight}px`;
+        paper.style.transform = '';
+        paper.classList.remove('letter-in-motion');
+        letterStage.classList.add('letter-on-top');
+      } else {
+        const growing = letterStage.animate([
+          { height:`${closedStageHeight}px` },{ height:`${stageOpenHeight}px` }
+        ], {duration:760,easing:'cubic-bezier(.22,.7,.24,1)',fill:'forwards'});
+        const moving = paper.animate([
+          {transform:start,offset:0},
+          {transform:'translate(0,-45px) scale(.91,.93)',offset:.58},
+          {transform:'none',offset:1}
+        ], {duration:790,easing:'cubic-bezier(.22,.8,.26,1)',fill:'forwards'});
+        // Once the top edge clears the envelope, place it in front of the flap.
+        await pause(335);
+        letterStage.classList.add('letter-on-top');
+        await Promise.all([growing.finished,moving.finished]);
+        growing.cancel(); moving.cancel();
+        letterStage.style.height = `${stageOpenHeight}px`;
+        paper.style.transform = '';
+        paper.classList.remove('letter-in-motion');
+      }
+      paper.focus({preventScroll:true});
+    } finally {
+      letterStage.classList.remove('letter-extracting');
+      letterBusy = false;
+    }
   }
   async function closeLetter() {
-    if ((!letterVisible && !letterBusy) || letterBusy) return;
+    if (letterBusy || !letterOpen) return;
     letterBusy = true;
+    letterStage.classList.add('letter-returning');
     try {
-      await animateLetter(false);
-      backdrop.hidden = true;
-      envelopeButton.classList.remove('is-open');
-      $('#envelope-label').textContent = 'Tap to break the seal';
-      document.documentElement.classList.remove('letter-open');
-      document.body.classList.remove('letter-open');
-      letterVisible = false;
-      restoreFocus.focus({ preventScroll:true });
-    } finally { letterBusy = false; }
+      await pause(duration(130)); // lettering fades before returning to the sleeve
+      const start = paperStartTransform(true);
+      const height = letterStage.getBoundingClientRect().height;
+      if (!prefersReducedMotion.matches) {
+        paper.classList.add('letter-in-motion');
+        const shrinking = letterStage.animate([{height:`${height}px`},{height:`${closedStageHeight}px`}],{
+          duration:690,easing:'cubic-bezier(.5,.02,.65,.2)',fill:'forwards'
+        });
+        const moving = paper.animate([
+          {transform:'none',offset:0},
+          {transform:'translate(0,-45px) scale(.91,.93)',offset:.45},
+          {transform:start,offset:1}
+        ], {duration:690,easing:'cubic-bezier(.5,.02,.65,.2)',fill:'forwards'});
+        await pause(320);
+        letterStage.classList.remove('letter-on-top');
+        await Promise.all([shrinking.finished,moving.finished]);
+        shrinking.cancel(); moving.cancel();
+        paper.classList.remove('letter-in-motion');
+      }
+      extraction.hidden = true;
+      letterStage.style.height = '';
+      letterStage.classList.remove('letter-on-top');
+      setLetterState(false);
+      letterOpen = false;
+      envelopeButton.focus({preventScroll:true});
+    } finally { letterBusy = false; letterStage.classList.remove('letter-returning'); }
   }
   envelopeButton.addEventListener('click', () => { void openLetter(); });
   closeLetterButton.addEventListener('click', () => { void closeLetter(); });
-  backdrop.addEventListener('click', (event) => { if (event.target === backdrop) void closeLetter(); });
   document.addEventListener('keydown', (event) => {
-    if (backdrop.hidden) return;
-    if (event.key === 'Escape') { event.preventDefault(); void closeLetter(); }
-    if (event.key === 'Tab' && !letterBusy) {
-      // Only the Close control is interactive inside the letter at present.
-      event.preventDefault(); closeLetterButton.focus({ preventScroll:true });
+    if (event.key === 'Escape' && letterOpen && !letterBusy) {
+      event.preventDefault(); void closeLetter();
     }
   });
 
